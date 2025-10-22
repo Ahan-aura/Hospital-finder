@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Doctor Appointment Booking</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb {
+            background-color: #f2f7fb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-10 p-6 bg-white rounded-xl shadow-lg">
+            <h1 class="text-4xl font-extrabold mb-2" style="color: #02475b;">HealthConnect Scheduler</h1>
+            <p class="text-gray-500">Book your appointment instantly and view the real-time schedule.</p>
+            <div id="user-info" class="mt-4 text-sm text-gray-700">
+                <span id="user-id-display" class="font-medium text-xs bg-blue-100 px-3 py-1 rounded-full shadow-inner">
+                    Loading User ID...
+                </span>
+            </div>
+        </header>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 p-6 bg-white rounded-xl shadow-2xl h-fit sticky top-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">New Appointment</h2>
+                <form id="booking-form" class="space-y-4">
+                    <div>
+                        <label for="patientName" class="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
+                        <input type="text" id="patientName" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm" placeholder="e.g., Jane Doe">
+                    </div>
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Patient Age</label>
+                        <input type="number" id="age" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm" placeholder="e.g., 30" min="0">
+                    </div>
+                    <div>
+                        <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Patient Gender</label>
+                        <select id="gender" required class="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm">
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="doctorSelect" class="block text-sm font-medium text-gray-700 mb-1">Doctor / Service</label>
+                        <select id="doctorSelect" required class="w-full p-3 border border-gray-300 bg-white rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm">
+                            <option value="" disabled selected>Select a Department/Doctor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="appointmentDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input type="date" id="appointmentDate" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm" min="2025-01-01">
+                    </div>
+                    <div>
+                        <label for="appointmentTime" class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                        <input type="time" id="appointmentTime" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 shadow-sm">
+                    </div>
+                    <button type="submit" id="submit-btn" class="w-full text-white font-semibold py-3 px-4 rounded-xl hover:bg-blue-700 transition duration-200 ease-in-out shadow-lg transform hover:scale-101 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50" style="background-color: #02475b;">
+                        Book Appointment
+                    </button>
+                </form>
+            </div>
+            <div class="lg:col-span-2 p-6 bg-white rounded-xl shadow-2xl">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex justify-between items-center">
+                    Upcoming Appointments
+                    <span id="appointment-count" class="text-sm font-normal text-blue-500 bg-blue-50 px-3 py-1 rounded-full">0 Appointments</span>
+                </h2>
+                <div id="appointments-list" class="space-y-4">
+                    <p id="loading-msg" class="text-center text-gray-500">Loading schedule...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center p-4 z-50 transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-95 opacity-0" id="modal-content-wrapper">
+            <h3 class="text-xl font-bold mb-3 text-gray-800" id="modal-title"></h3>
+            <p class="text-gray-600 mb-4" id="modal-message"></p>
+            <button id="modal-close-btn" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition duration-150">Close</button>
+        </div>
+    </div>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKd59GeEC9TUZYKWjouyfppRwnkJSxxUQ",
+        authDomain: "appo-e6f45.firebaseapp.com",
+        projectId: "appo-e6f45",
+        storageBucket: "appo-e6f45.appspot.com",
+        messagingSenderId: "123701876241",
+        appId: "1:123701876241:web:201c7e2ccb0c2ca6f703b0",
+        measurementId: "G-B39GZ9YB22"
+    };
+
+    const doctorServices = [
+        { id: "cardiology", name: "Cardiology (Dr. Alani)" },
+        { id: "neurology", name: "Neurology (Dr. Chen)" },
+        { id: "pediatrics", name: "Pediatrics (Dr. Smith)" },
+        { id: "orthopedics", name: "Orthopedics (Dr. Varma)" },
+        { id: "dermatology", name: "Dermatology (Dr. Kim)" }
+    ];
+
+    let app, db, auth, userId = null;
+    const appointmentsCollectionPath = "appointments";
+    const form = document.getElementById('booking-form');
+    const appointmentsList = document.getElementById('appointments-list');
+    const doctorSelect = document.getElementById('doctorSelect');
+    const submitButton = document.getElementById('submit-btn');
+    const loadingMsg = document.getElementById('loading-msg');
+    const userIdDisplay = document.getElementById('user-id-display');
+    const appointmentCount = document.getElementById('appointment-count');
+    const modal = document.getElementById('custom-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalContentWrapper = document.getElementById('modal-content-wrapper');
+
+    function showMessage(title, message) {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modal.classList.remove('hidden', 'opacity-0');
+        modal.classList.add('flex', 'opacity-100');
+        setTimeout(() => {
+            modalContentWrapper.classList.remove('scale-95', 'opacity-0');
+            modalContentWrapper.classList.add('scale-100', 'opacity-100');
+        }, 50);
+    }
+
+    function hideMessage() {
+        modalContentWrapper.classList.remove('scale-100', 'opacity-100');
+        modalContentWrapper.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.remove('flex', 'opacity-100');
+            modal.classList.add('hidden', 'opacity-0');
+        }, 300);
+    }
+    modalCloseBtn.addEventListener('click', hideMessage);
+
+    function populateDoctorSelect() {
+        doctorSelect.innerHTML = '<option value="" disabled selected>Select a Department/Doctor</option>';
+        doctorServices.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = doc.name;
+            doctorSelect.appendChild(option);
+        });
+    }
+
+    function formatTimestamp(timestamp) {
+        if (!timestamp || typeof timestamp.toDate !== 'function') return 'N/A';
+        const date = timestamp.toDate();
+        const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return `${dateStr} at ${timeStr}`;
+    }
+
+    async function bookAppointment(e) {
+        e.preventDefault();
+        if (!db || !userId) {
+            showMessage('Error', 'Database connection not ready. Please wait a moment.');
+            return;
+        }
+        submitButton.disabled = true;
+        submitButton.textContent = 'Booking...';
+
+        const name = document.getElementById('patientName').value.trim();
+        const age = document.getElementById('age').value;
+        const gender = document.getElementById('gender').value;
+        const doctorId = document.getElementById('doctorSelect').value;
+        const date = document.getElementById('appointmentDate').value;
+        const time = document.getElementById('appointmentTime').value;
+
+        if (!name || !age || !gender || !doctorId || !date || !time) {
+            showMessage('Validation Error', 'Please fill in all fields.');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Book Appointment';
+            return;
+        }
+
+        try {
+            const appointmentDateTime = new Date(`${date}T${time}:00`);
+            if (appointmentDateTime.getFullYear() < 2024) {
+                showMessage('Validation Error', 'Please choose a valid future date.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Book Appointment';
+                return;
+            }
+            const newAppointment = {
+                patientName: name,
+                patientAge: parseInt(age, 10),
+                patientGender: gender,
+                doctorId: doctorId,
+                doctorName: doctorServices.find(d => d.id === doctorId)?.name || 'Unknown Doctor',
+                dateTime: Timestamp.fromDate(appointmentDateTime),
+                bookedAt: serverTimestamp(),
+                bookedBy: userId
+            };
+            await addDoc(collection(db, appointmentsCollectionPath), newAppointment);
+            showMessage('Success!', `Appointment booked successfully for ${newAppointment.doctorName}.`);
+            form.reset();
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            showMessage('Booking Failed', `There was an error saving your appointment. Error: ${error.message}`);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Book Appointment';
+        }
+    }
+
+    function setupRealtimeListener() {
+        if (!db) {
+            console.error("Firestore not initialized.");
+            return;
+        }
+        const q = query(collection(db, appointmentsCollectionPath));
+        onSnapshot(q, (snapshot) => {
+            const appointments = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const sortableDate = data.dateTime?.toDate ? data.dateTime.toDate().getTime() : 0;
+                appointments.push({ id: doc.id, sortableDate, ...data });
+            });
+            appointments.sort((a, b) => a.sortableDate - b.sortableDate);
+            renderAppointments(appointments.filter(app => app.sortableDate >= Date.now()));
+        }, (error) => {
+            console.error("Error listening to appointments: ", error);
+            appointmentsList.innerHTML = '<p class="text-red-500 text-center">Failed to load schedule. Check console for errors.</p>';
+        });
+    }
+
+    function renderAppointments(appointments) {
+        appointmentsList.innerHTML = '';
+        appointmentCount.textContent = `${appointments.length} Appointments`;
+        loadingMsg.classList.add('hidden');
+        if (appointments.length === 0) {
+            appointmentsList.innerHTML = `
+                <div class="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                    <p class="text-gray-500 font-semibold">No upcoming appointments yet!</p>
+                    <p class="text-sm text-gray-400">Be the first to book one in the form on the left.</p>
+                </div>
+            `;
+            return;
+        }
+        appointments.forEach(app => {
+            const isMine = app.bookedBy === userId;
+            const bookingClass = isMine ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 bg-white shadow-sm';
+            const timeStr = formatTimestamp(app.dateTime);
+            const doctorInfo = doctorServices.find(d => d.id === app.doctorId) || { name: 'Service Unknown' };
+            const appointmentCard = document.createElement('div');
+            appointmentCard.className = `p-4 border-l-4 rounded-lg transition duration-200 hover:shadow-lg ${bookingClass}`;
+            appointmentCard.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="font-bold text-lg text-gray-800">${app.patientName} (${app.patientAge} ${app.patientGender.substring(0, 1).toUpperCase()})</div>
+                    ${isMine ? '<span class="text-xs font-semibold text-blue-600 bg-blue-200 px-2 py-0.5 rounded-full">Your Booking</span>' : ''}
+                </div>
+                <div class="text-sm text-gray-600 mt-1 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>${doctorInfo.name}</span>
+                </div>
+                <div class="text-sm text-gray-600 mt-1 flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-medium">${timeStr}</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-2 border-t pt-2">
+                    Booked by User ID: <span class="truncate">${app.bookedBy}</span>
+                </div>
+            `;
+            appointmentsList.appendChild(appointmentCard);
+        });
+    }
+
+    async function initializeAppAndAuth() {
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            await signInAnonymously(auth);
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    userIdDisplay.textContent = `Current User ID: ${userId}`;
+                    setupRealtimeListener();
+                } else {
+                    userId = crypto.randomUUID();
+                    userIdDisplay.textContent = `Anon User ID: ${userId}`;
+                    appointmentsList.innerHTML = '<p class="text-red-500 text-center">Authentication failed. Check Firebase Auth settings.</p>';
+                }
+                populateDoctorSelect();
+                form.addEventListener('submit', bookAppointment);
+            });
+        } catch (error) {
+            console.error("Initialization Error:", error);
+            showMessage('Setup Error', `Could not initialize the app or sign in. Error: ${error.message}`);
+        }
+    }
+    window.onload = initializeAppAndAuth;
+    </script>
+</body>
+</html>

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital Portal - Donation Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* BASE STYLES - Copied from original for consistency */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f7fa;
+            color: #02475b;
+            overflow-x: hidden;
+            padding-top: 105px; /* Space for the sticky header (reduced) */
+        }
+        .modal-open {
+            overflow: hidden;
+        }
+
+        /* --- STICKY HEADER CONTAINER (Light & Minimal) --- */
+        .header-container {
+            position: fixed;
+            top: 0;
+            width: 99%;
+            z-index: 999;
+            background-color: #fff; /* Solid white background */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            margin: 0 auto;
+            transition: all 0.3s;
+            border-radius: 15px;
+        }
+
+
+        .navbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff;
+            padding: 12px 3vw;
+            gap: 20px;
+            max-width: 95%;
+            margin: 0 auto;
+            border-radius:20px;
+            transition: all 0.3s;
+        }
+
+        .logo {
+             /* Ensures logo space is maintained if text is used, or to align other elements */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #02475b;
+            padding: 0 10px;
+        }
+        .logo img {
+            height: 48px; /* Slightly smaller logo */
+            width: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .logo img:hover { transform: scale(1.05); }
+
+        .location-wrapper {
+            position: relative;
+            min-width: 170px;
+        }
+        .location-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: #eaf3f5; /* Light background */
+            color: #02475b;
+            padding: 7px 16px; /* Tighter padding */
+            border-radius: 18px; /* Softer pill shape */
+            font-weight: 500; font-size: 0.9rem;
+            border: 1px solid #d4e8ec; /* Faint border for depth */
+            transition: all 0.2s;
+            cursor: pointer;
+            justify-content: space-between; /* Added to space items */
+        }
+        .location-pill:hover {
+            background: #d8edf0;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .location-pill i { color: #02475b;font-size: 1.0em;}
+
+        /* NEW: Style for the location text span and toggle button */
+        .location-pill > span {
+            flex-grow: 1;
+            text-align: left;
+            min-width: 100px;
+        }
+
+        .location-pill button {
+            background: transparent;
+            border: none;
+            color: #02475b;
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 0 0 0 5px;
+            margin: 0;
+            outline: none;
+            transition: color 0.1s;
+        }
+        .location-pill button:hover {
+            color: #04677f;
+        }
+
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 40px; /* Adjusted position */
+            left: 0;
+            width: 100%;
+            background: #fff; border: 1px solid #cdebf3;
+            border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            overflow: hidden;
+        }
+        .dropdown select {
+            width: 100%; font-size:15px; padding:10px; border-radius:0; border:none; color:#02475b;
+            outline: none; cursor: pointer;
+        }
+
+        .search-pill {
+            display: flex; align-items: center;
+            background: #f6fafc;
+            border-radius: 18px;
+            border: 1px solid #e1e7ec;
+            box-shadow: none;
+            max-width: 400px;
+            width: 100%;
+            padding: 7px 14px;
+            transition: all 0.2s ease-in-out;
+        }
+        .search-pill:hover, .search-pill:focus-within {
+            box-shadow: 0 0 0 2px #12d8c566;
+            border-color: #12d8c5;
+        }
+        .search-pill .fa-magnifying-glass {
+            font-size: 0.95rem; color: #7bbdd6; margin-right: 8px;
+        }
+        .search-pill input {
+            border: none; background: transparent; font-size: 0.95rem;
+            outline: none; color: #02475b;
+            width: 100%;
+        }
+        .search-pill input::placeholder { color: #95a1be;}
+
+        /* LOGIN/USER PILLS */
+        .login-pill, .user-pill {
+            display: flex; align-items: center; gap: 6px;
+            font-weight: 600; font-size: 0.95rem;
+            border-radius: 20px; padding: 8px 20px;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: none;
+        }
+        .login-pill {
+            border: 2px solid #02475b; /* Dark primary border */
+            background: #fff;
+            color: #02475b;
+        }
+        .login-pill a { color: #02475b; }
+        .login-pill:hover { background-color: #02475b; color: #ffffff; border-color: #02475b;
+            box-shadow: 0 4px 10px rgba(0, 71, 91, 0.2);
+        }
+        .login-pill:hover a{ color: #ffffff;}
+
+        .user-pill {
+            display: none;
+            background: #02475b;
+            color: #ffffff;
+            border: 2px solid #02475b;
+        }
+        .user-pill:hover {
+            background-color: #04677f;
+        }
+        .user-pill .fa-circle-user { font-size: 1.1em; color: #fff;}
+        .user-dropdown {
+            display: none; position: absolute; top: 100%; right: 0;
+            background: #fff; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 8px; width: 160px; z-index: 100; overflow: hidden;
+        }
+        .user-dropdown a {
+            display: block; padding: 8px 12px; color: #02475b; text-decoration: none;
+            font-size: 0.9rem; font-weight: 500; transition: background 0.1s;
+        }
+        .user-dropdown a:hover { background: #eafbff; }
+
+        /* --- 2. BOTTOM NAVIGATION BAR (Links) --- */
+        .bottom-navbar {
+            background: #fdfdfd; /* Pure white or nearly white for separation */
+            border-radius: 0;
+            max-width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Minimal shadow for depth */
+        }
+        .bottom-navbar ul {
+            display: flex; justify-content: center; align-items: center; gap: 35px;
+            padding: 8px 0; /* Very minimal padding */
+            margin: 0; list-style: none;
+        }
+        .bottom-navbar ul li a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #0e404b;
+            text-decoration: none; letter-spacing:0.3px;
+            border-radius: 10px;
+            padding: 6px 8px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .bottom-navbar ul li a:hover {
+            background-color: #02475b; /* Light hover background */
+            color: #ffffff;
+        }
+        /* Active link for this page */
+        .bottom-navbar ul li a[href="#donation"] {
+             background-color: #02475b;
+             color: #ffffff;
+        }
+
+
+        /* --- NEW STYLES for Registration Form --- */
+        .register-section {
+            max-width: 750px; margin: 70px auto 0 auto;
+            background: #fff;
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .register-section h1 {
+            font-size: 2.2rem; color: #02475b; margin-bottom: 30px; text-align: center;
+        }
+        
+        /* Step Indicator */
+        .step-indicator {
+            display: flex; justify-content: space-between; margin-bottom: 30px;
+            position: relative;
+        }
+        .step-indicator::before {
+            content: ''; position: absolute; top: 15px; left: 10%; right: 10%; height: 2px;
+            background: #cdebf3; z-index: 1;
+        }
+        .step {
+            z-index: 2; text-align: center; width: 33%;
+        }
+        .step-circle {
+            width: 30px; height: 30px; line-height: 30px; margin: 0 auto 10px auto;
+            border-radius: 50%; background: #cdebf3; color: #fff; font-weight: 600;
+            transition: all 0.3s; border: 3px solid #fff;
+        }
+        .step.active .step-circle {
+            background: #12d8c5; box-shadow: 0 0 0 5px #12d8c540;
+        }
+        .step-label {
+            font-size: 0.9rem; color: #7bbdd6; font-weight: 500;
+        }
+        .step.active .step-label { color: #02475b; font-weight: 600; }
+        
+        /* Form content container */
+        .form-content {
+            padding: 20px 0;
+        }
+        .form-page {
+            display: none; /* Controlled by JS */
+        }
+        .form-page.active {
+            display: block;
+        }
+        
+        /* Form elements */
+        .form-group { margin-bottom: 25px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: #05596b; font-size: 1rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 15px; border: 1px solid #cdebf3;
+            border-radius: 8px; font-size: 1rem; color: #02475b;
+            transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #12d8c5; box-shadow: 0 0 0 3px #12d8c530; outline: none;
+        }
+        
+        /* Radio button styling for donation type */
+        .radio-group {
+            display: flex; gap: 20px; justify-content: center; margin-bottom: 20px;
+        }
+        .radio-tile {
+            text-align: center; padding: 20px; border: 2px solid #cdebf3; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s; background: #f6fafc; width: 45%;
+        }
+        .radio-tile:hover { background: #eafbff; border-color: #02475b; }
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group input[type="radio"]:checked + .radio-tile {
+            border-color: #ff5757; background: #fff0f0; box-shadow: 0 4px 10px rgba(255, 87, 87, 0.2);
+        }
+        .radio-tile i { font-size: 2.5rem; color: #ff5757; margin-bottom: 8px; }
+        .radio-tile span { display: block; font-weight: 600; color: #02475b; }
+        .radio-group input[type="radio"]:checked + .radio-tile #organ-icon { color: #12d8c5; }
+        .radio-group input[type="radio"]:checked + .radio-tile {
+            border-color: #12d8c5; background: #eafffe;
+        }
+        .radio-group input[id="blood"]:checked + .radio-tile {
+             border-color: #ff5757; background: #fff0f0;
+        }
+        .radio-group input[id="blood"]:checked + .radio-tile i { color: #ff5757; }
+
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex; justify-content: space-between; margin-top: 30px;
+            gap: 15px;
+        }
+        .form-actions button {
+            padding: 12px 25px; border-radius: 32px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; font-size: 1rem;
+            border: 2px solid #02475b;
+        }
+        .next-btn {
+            background: #02475b; color: #ffffff;
+            flex-grow: 1;
+        }
+        .next-btn:hover { background: #04677f; }
+
+        .prev-btn {
+            background: #fff; color: #02475b;
+        }
+        .prev-btn:hover { background: #eaf3f5; }
+
+        .submit-btn-final {
+            background: #12d8c5; color: #02475b; border-color: #12d8c5;
+            flex-grow: 1;
+        }
+        .submit-btn-final:hover { background: #0cbeb5; }
+        
+        /* Success/Error Message */
+        .message-box {
+            padding: 20px; border-radius: 12px; text-align: center;
+            font-weight: 600; margin-top: 20px; display: none;
+        }
+        .success-message {
+            background: #eafbff; color: #12d8c5; border: 1px solid #12d8c5;
+        }
+        .error-message {
+            background: #f2dede; color: #d9534f; border: 1px solid #d9534f;
+        }
+
+
+        /* Footer styles (Reused from original) */
+        .footer {
+            background:#fff; color:#02475b; padding:44px 8vw 24px 8vw; text-align:center;
+            border-radius: 0 0 24px 24px; box-shadow:0 -2px 16px #1273de06;
+            font-size:1.08rem; margin-top:60px;
+        }
+        .footer .socials { margin: 18px 0 0 0;}
+        .footer .socials a {
+            color:#02475b; margin:0 14px; font-size:1.35rem;transition:color 0.23s;
+        }
+        .footer .socials a:hover { color: #165d59;}
+
+        /* Modal styles (Copied verbatim for functionality) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); z-index: 1000; display: none;
+            justify-content: center; align-items: flex-start; padding-top: 50px;
+        }
+
+        .login-modal, .signup-modal {
+            position: fixed; left: 30%; top: 15%; width: 400px; max-width: 90%;
+            background: #ffffff; border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px; animation: slideIn 0.3s ease-out; z-index: 1001;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { color: #02475b; font-size: 1.8rem; margin: 0; }
+        .close-btn { font-size: 2rem; font-weight: 300; color: #7bbdd6; cursor: pointer; transition: color 0.1s; }
+        .close-btn:hover { color: #02475b; }
+        
+        /* Responsive Media Queries (Reused from original) */
+        @media (max-width:900px) {
+            .navbar { padding: 13px 2vw; margin: 0 auto; max-width: 96%;}
+            .search-pill { min-width: 160px; max-width: 98vw;}
+            .bottom-navbar { margin: 0 auto; max-width: 96%;}
+            .bottom-navbar ul { gap:22px;}
+            .register-section { max-width: 90%; }
+        }
+        @media (max-width:650px){
+            body { padding-top: 170px; }
+            .navbar { flex-direction: column; gap:16px;}
+            .bottom-navbar ul { gap: 9px; flex-wrap: wrap;}
+            .location-wrapper, .search-pill, .login-pill, .user-pill { margin: 0 auto; width: 90%;}
+            .register-section { padding: 25px; }
+            .login-modal, .signup-modal { left: 5%; top: 50px; width: 90%; }
+            .radio-group { flex-direction: column; gap: 15px; }
+            .radio-tile { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <section class="register-section">
+        <h1>Donation Registration Form</h1>
+        
+        <div class="step-indicator" id="stepIndicator">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Type & Consent</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Personal Details</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Review & Submit</div>
+            </div>
+        </div>
+
+        <form id="donationForm">
+            <div class="form-content">
+                
+                <div class="form-page active" data-page="1">
+                    <div class="form-group">
+                        <label>Select Donation Type:</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="donationType" id="blood" value="blood" required>
+                                <div class="radio-tile">
+                                    <i class="fa-solid fa-droplet"></i>
+                                    <span>Blood Donation</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="donationType" id="organ" value="organ" required>
+                                <div class="radio-tile">
+                                    <i class="fa-solid fa-hands-holding-heart" id="organ-icon"></i>
+                                    <span>Organ Pledge</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="consent">Important Consent:</label>
+                        <input type="checkbox" id="consent" required style="width: auto;">
+                        <span style="font-size: 0.9em; margin-left: 10px; color: #555;">I confirm I have read the eligibility criteria and consent to the hospital contacting me.</span>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="2">
+                    <div class="form-group">
+                        <label for="fullName">Full Name:</label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth:</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Email Address:</label>
+                        <input type="email" id="contactEmail" name="contactEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group (Optional for Organ):</label>
+                        <select id="bloodGroup" name="bloodGroup">
+                            <option value="">Select Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-page" data-page="3">
+                    <h3 style="color: #04677f; margin-bottom: 20px; text-align: center;">Review Your Information</h3>
+                    
+                    <div style="background: #f6fafc; padding: 20px; border-radius: 12px; border: 1px solid #e1e7ec; line-height: 1.8;">
+                        <p><strong>Donation Type:</strong> <span id="reviewType"></span></p>
+                        <p><strong>Full Name:</strong> <span id="reviewName"></span></p>
+                        <p><strong>Date of Birth:</strong> <span id="reviewDOB"></span></p>
+                        <p><strong>Phone Number:</strong> <span id="reviewPhone"></span></p>
+                        <p><strong>Email:</strong> <span id="reviewEmail"></span></p>
+                        <p><strong>Blood Group:</strong> <span id="reviewBloodGroup"></span></p>
+                    </div>
+                    
+                    <div class="message-box" id="submissionMessage"></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="prev-btn" id="prevBtn" style="display:none;"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                <button type="button" class="next-btn" id="nextBtn">Next <i class="fa-solid fa-arrow-right"></i></button>
+                <button type="submit" class="submit-btn-final" id="submitBtn" style="display:none;"><i class="fa-solid fa-heart"></i> Complete Registration</button>
+            </div>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <div>
+            Your Hospital – Caring for you, always.<br>
+            <div style="margin-top:11px;">Call us: <b>+91 90000 00000</b> | Email: <b>contact@yourhospital.com</b></div>
+        </div>
+        <div class="socials">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <div style="margin-top:18px;opacity:.75;font-size:.98em;">
+            © 2025 Your Hospital. All Rights Reserved.
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="loginModalOverlay">
+        <div class="login-modal">
+            <div class="modal-header">
+                <h2>Patient Login</h2>
+                <span class="close-btn login-close-btn">&times;</span>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email or Phone:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login Securely</button>
+                <div class="error-message" id="loginErrorMessage" style="display:none;"></div>
+                <div class="form-footer">
+                    New User? <a id="showSignupLink" href="#">Sign Up Here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="signupModalOverlay" style="display:none;">
+        <div class="signup-modal">
+            <div class="modal-header">
+                <h2>Register New Account</h2>
+                <span class="close-btn signup-close-btn">&times;</span>
+            </div>
+            <form class="signup-form" id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" name="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password:</label>
+                    <input type="password" id="signupPassword" name="signupPassword" required minlength="6">
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+                <div class="error-message" id="signupErrorMessage" style="display:none;"></div>
+                <div class="form-footer">
+                    Already have an account? <a id="showLoginLink" href="#">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // 🛑 IMPORTANT: REPLACE THIS WITH YOUR ACTUAL GOOGLE MAPS PLATFORM KEY 🛑
+        const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIGxImEMAlJn_LvTD6XLs4DRAfeW6-784",
+            authDomain: "user-autrhentication.firebaseapp.com",
+            projectId: "user-autrhentication",
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
+        // --- DOM Elements ---
+        // Some elements from previous pages may not exist here. Guard all references to avoid runtime errors.
+        const loginButton = document.getElementById('loginButton');
+        const userPill = document.getElementById('userPill');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const userDropdown = document.getElementById('userDropdown');
+        const logoutLink = document.getElementById('logoutLink');
+        const loginModalOverlay = document.getElementById('loginModalOverlay');
+        const signupModalOverlay = document.getElementById('signupModalOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const loginCloseBtn = document.querySelector('.login-close-btn');
+        const signupCloseBtn = document.querySelector('.signup-close-btn');
+        const showSignupLink = document.getElementById('showSignupLink');
+        const showLoginLink = document.getElementById('showLoginLink');
+
+        // Form Specific Elements
+        const donationForm = document.getElementById('donationForm');
+        const formPages = document.querySelectorAll('.form-page');
+        const stepElements = document.querySelectorAll('.step');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const submissionMessage = document.getElementById('submissionMessage');
+        
+        let currentStep = 1;
+
+        // --- Donation Form Logic ---
+
+        function updateFormStep() {
+            // Update page display
+            formPages.forEach(page => {
+                page.classList.remove('active');
+                if (parseInt(page.getAttribute('data-page')) === currentStep) {
+                    page.classList.add('active');
+                }
+            });
+
+            // Update step indicator
+            stepElements.forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.getAttribute('data-step')) <= currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update button visibility
+            prevBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+            nextBtn.style.display = currentStep < formPages.length ? 'inline-block' : 'none';
+            submitBtn.style.display = currentStep === formPages.length ? 'inline-block' : 'none';
+            
+            // Scroll to the top of the form for better UX
+            document.querySelector('.register-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Handle Step 3 (Review) content
+            if (currentStep === 3) {
+                updateReviewData();
+            }
+        }
+
+        function validateCurrentPage() {
+            const currentPage = document.querySelector(`.form-page[data-page="${currentStep}"]`);
+            if (!currentPage) return true; // nothing to validate
+
+            const requiredFields = currentPage.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                // For radio groups, check if any of the same-name radios are checked
+                if (field.type === 'radio') {
+                    const name = field.name;
+                    if (!document.querySelector(`input[name="${name}"]:checked`)) {
+                        isValid = false;
+                    }
+                } else if (field.type === 'checkbox') {
+                    if (!field.checked) {
+                        isValid = false;
+                    }
+                } else {
+                    const value = field.value;
+                    if (value === undefined || value === null || value.toString().trim() === '') {
+                        isValid = false;
+                    }
+                }
+            });
+
+            if (!isValid) {
+                alert("Please fill in all required fields on this page before continuing.");
+            }
+            return isValid;
+        }
+
+        function updateReviewData() {
+            const donationType = document.querySelector('input[name="donationType"]:checked')?.value;
+            const bloodGroup = document.getElementById('bloodGroup')?.value;
+            
+            document.getElementById('reviewType').textContent = donationType === 'blood' ? 'Blood Donation' : (donationType === 'organ' ? 'Organ Pledge' : 'N/A');
+            document.getElementById('reviewName').textContent = document.getElementById('fullName')?.value || '';
+            document.getElementById('reviewDOB').textContent = document.getElementById('dateOfBirth')?.value || '';
+            document.getElementById('reviewPhone').textContent = document.getElementById('phone')?.value || '';
+            document.getElementById('reviewEmail').textContent = document.getElementById('contactEmail')?.value || '';
+            document.getElementById('reviewBloodGroup').textContent = bloodGroup || 'Not Specified';
+            
+            // Clear message box on review page entry
+            submissionMessage.style.display = 'none';
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (validateCurrentPage() && currentStep < formPages.length) {
+                currentStep++;
+                updateFormStep();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateFormStep();
+            }
+        });
+
+        donationForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            // Final validation (should be valid if all previous steps were)
+            if (!validateCurrentPage()) return; 
+
+            // Simulate server submission
+            const formData = new FormData(donationForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            console.log("Submitting Donation Data:", data);
+            
+            // Display success message
+            submissionMessage.className = 'message-box success-message';
+            submissionMessage.innerHTML = '<i class="fa-solid fa-check-circle"></i> *Success!* Your ' + 
+                                          (data.donationType === 'blood' ? 'Blood Donation registration' : 'Organ Pledge') + 
+                                          ' is complete. We will contact you shortly.';
+            submissionMessage.style.display = 'block';
+            
+            // Disable buttons after submission
+            prevBtn.style.display = 'none';
+            submitBtn.style.display = 'none';
+        });
+
+        // Initialize form on load
+        document.addEventListener('DOMContentLoaded', updateFormStep);
+        
+        // --- End Donation Form Logic ---
+
+        // --- Firebase/Auth Logic (Copied from previous pages) ---
+
+        function clearLoginError() { if (document.getElementById('loginErrorMessage')) document.getElementById('loginErrorMessage').style.display = 'none'; }
+        function setLoginError(message) { if (document.getElementById('loginErrorMessage')) { const el = document.getElementById('loginErrorMessage'); el.textContent = message; el.style.display = 'block'; } }
+        function clearSignupError() { if (document.getElementById('signupErrorMessage')) document.getElementById('signupErrorMessage').style.display = 'none'; }
+        function setSignupError(message) { if (document.getElementById('signupErrorMessage')) { const el = document.getElementById('signupErrorMessage'); el.textContent = message; el.style.display = 'block'; } }
+
+        function updateUIAfterAuth(user) {
+            // Safely update UI only if elements exist
+            if (user) {
+                if (loginButton) loginButton.style.display = 'none';
+                if (userPill) userPill.style.display = 'flex';
+                if (userEmailDisplay) {
+                    const displayName = user.email ? user.email.split('@')[0] : 'User';
+                    userEmailDisplay.textContent = displayName;
+                }
+            } else {
+                if (loginButton) loginButton.style.display = 'flex';
+                if (userPill) userPill.style.display = 'none';
+                if (userDropdown) userDropdown.style.display = 'none';
+            }
+        }
+
+        function toggleUserDropdown() {
+            if (!userDropdown) return;
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showLoginModal(event) {
+            if (event) event.preventDefault();
+            if (signupModalOverlay) signupModalOverlay.style.display = 'none';
+            if (loginModalOverlay) {
+                loginModalOverlay.style.display = 'flex';
+                document.body.classList.add('modal-open');
+            }
+            // Simplified error handling clear/reset
+            clearLoginError();
+        }
+
+        function hideAllModals() {
+            if (loginModalOverlay) loginModalOverlay.style.display = 'none';
+            if (signupModalOverlay) signupModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        
+        // Modal Event Listeners (guarded)
+        if (loginButton) loginButton.addEventListener('click', showLoginModal);
+        if (userPill) userPill.addEventListener('click', (e) => { e.stopPropagation(); toggleUserDropdown(); });
+        if (logoutLink) logoutLink.addEventListener('click', (event) => {
+             event.preventDefault();
+             auth.signOut().then(() => { updateUIAfterAuth(null); });
+        });
+        if (loginCloseBtn) loginCloseBtn.addEventListener('click', hideAllModals);
+        if (signupCloseBtn) signupCloseBtn.addEventListener('click', hideAllModals);
+        if (showSignupLink) showSignupLink.addEventListener('click', (e) => { e.preventDefault(); if (loginModalOverlay) loginModalOverlay.style.display = 'none'; if (signupModalOverlay) signupModalOverlay.style.display = 'flex'; });
+        if (showLoginLink) showLoginLink.addEventListener('click', (e) => { e.preventDefault(); if (signupModalOverlay) signupModalOverlay.style.display = 'none'; if (loginModalOverlay) loginModalOverlay.style.display = 'flex'; });
+
+        auth.onAuthStateChanged(updateUIAfterAuth);
+        
+        // Dummy GeoLocation Setup (Copied from previous pages) - guarded
+        const locationPill = document.getElementById('location');
+        const locationDropdown = document.getElementById('locationDropdown');
+        const locationToggleBtn = document.getElementById('locationToggleBtn');
+        const locationText = document.getElementById("locationText");
+        const citySelect = document.getElementById("citySelect");
+        
+        let currentCity = "Select Location";
+        if (locationText) locationText.textContent = currentCity;
+        
+        if (locationPill) {
+            locationPill.addEventListener("click", (e) => {
+                if (e.target !== locationToggleBtn && (!locationToggleBtn || !locationToggleBtn.contains(e.target))) {
+                     e.stopPropagation();
+                    if (locationDropdown) locationDropdown.style.display = locationDropdown.style.display === "block" ? "none" : "block";
+                }
+            });
+        }
+        document.addEventListener("click", (e) => {
+            const wrapper = document.querySelector('.location-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                if (locationDropdown) locationDropdown.style.display = "none";
+            }
+        });
+        if (citySelect) {
+            citySelect.addEventListener("change", () => {
+                if (citySelect.value) {
+                    if (locationText) locationText.textContent = citySelect.value;
+                    if (locationDropdown) locationDropdown.style.display = "none";
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

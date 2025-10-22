@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteCare - Advanced Doctor Directory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: linear-gradient(135deg, #02475b 0%, #013243 100%);
+            --accent-color: linear-gradient(135deg, #014d4e 0%, #026d6d 100%);
+            --success-color: linear-gradient(135deg, #059669 0%, #047857 100%);
+            --warning-color: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            --danger-color: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            --background-color: #f0f7fa;
+            --card-background: rgba(255, 255, 255, 0.95);
+            --text-color-dark: #011e2d;
+            --text-color-medium: #0b4759;
+            --text-color-light: #1e5f77;
+            --border-color: rgba(30, 95, 119, 0.2);
+            --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f7fa 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #02475b 0%, #013243 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin: 0 0 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin: 0 0 30px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .cta-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .cta-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Filter & Search Box Styles - Enhanced with Glassmorphism */
+        .filter-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin:  -20px auto 50px;
+            padding: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            width: 95%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-subtle);
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-background);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+            transition: transform 0.3s ease;
+        }
+
+        .filter-group:hover {
+            transform: translateY(-2px);
+        }
+
+        .filter-box label {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-color-medium);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-box select, .filter-box input[type="text"] {
+            padding: 12px 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-background);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 220px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-box select:focus, .filter-box input[type="text"]:focus {
+            outline: none;
+            border-color: transparent;
+            box-shadow: 0 0 0 3px rgba(2, 71, 91, 0.1);
+            transform: scale(1.02);
+        }
+
+        /* Sorting Options */
+        .sort-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-background);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        /* Doctor List and Card Styles - Enhanced Grid with Animations */
+        .doctor-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+
+        .container {
+            background: var(--card-background);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            border: 1px solid var(--glass-border);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover::before {
+            transform: scaleX(1);
+        }
+
+        .container:hover {
+            transform: translateY(-10px) rotateX(2deg);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .hidden {
+            display: none !important;
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .container:not(.hidden) {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Doctor Image and Avatar - Enhanced */
+        .avatar-box {
+            position: relative;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .avatar-box img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .container:hover .avatar-box img {
+            transform: scale(1.1);
+        }
+
+        /* Availability Badge - Enhanced */
+        .availability {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover .availability {
+            transform: scale(1.05);
+        }
+
+        .availability.online { background: var(--success-color); }
+        .availability.offline { background: var(--danger-color); }
+        .availability.busy { background: var(--warning-color); }
+
+        /* Doctor Info Section */
+        .info-section {
+            padding: 30px 30px 20px;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .doctor-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0 0 5px;
+            background: var(--primary-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .specialization {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-color-dark);
+            padding: 6px 16px;
+            background: linear-gradient(135deg, rgba(2, 71, 91, 0.1) 0%, rgba(1, 50, 67, 0.1) 100%);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: inline-block;
+            border: 1px solid rgba(2, 71, 91, 0.2);
+        }
+
+        /* Details Grid - Enhanced with Icons */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 15px;
+            background: rgba(240, 247, 250, 0.5);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(2, 71, 91, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .detail-item i {
+            font-size: 1.5em;
+            background: var(--primary-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .detail-item strong {
+            font-size: 1.3em;
+            color: var(--text-color-dark);
+            font-weight: 700;
+            display: block;
+        }
+
+        .detail-label {
+            color: var(--text-color-medium);
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+
+        /* Rating with Full Stars */
+        .rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 1em;
+        }
+
+        .rating i {
+            color: #fbbf24;
+        }
+
+        /* Fee - Enhanced */
+        .fee {
+            font-size: 1.5em;
+            font-weight: 800;
+            background: var(--danger-color);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin: 20px 0;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(185, 28, 28, 0.1) 100%);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .fee span {
+            font-weight: 400;
+            font-size: 0.75em;
+            color: var(--text-color-medium);
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Book Button - Enhanced with Pulse Animation */
+        .book-btn {
+            margin: 0 30px 30px;
+            padding: 16px 32px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .book-btn:hover::before {
+            left: 100%;
+        }
+
+        .book-btn:hover {
+            background: linear-gradient(135deg, #013243 0%, #011e2d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(2, 71, 91, 0.3);
+        }
+
+        .disabled-btn {
+            background: var(--text-color-medium) !important;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .disabled-btn:hover {
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Modal for Booking */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-hover);
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        .close {
+            color: var(--text-color-medium);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: var(--text-color-dark);
+        }
+
+        .modal-header {
+            padding: 20px 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color-dark);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Bookings Modal */
+        .bookings-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .bookings-content {
+            background: var(--card-background);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            position: relative;
+        }
+
+        .bookings-header {
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bookings-list {
+            padding: 20px 30px;
+        }
+
+        .booking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(240, 247, 250, 0.5);
+            border-radius: 8px;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .booking-details {
+            flex: 1;
+        }
+
+        .booking-meta {
+            font-size: 0.85em;
+            color: var(--text-color-medium);
+            margin-top: 4px;
+        }
+
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-color-medium);
+        }
+
+        .view-bookings {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: var(--shadow-card);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .view-bookings:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(1, 30, 45, 0.8);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 80px;
+        }
+
+        .footer p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        /* Media Queries - Enhanced Responsiveness */
+        @media (max-width: 768px) {
+            .filter-box {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .filter-group, .sort-group {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .filter-box select, .filter-box input[type="text"] {
+                min-width: 100%;
+            }
+
+            .doctor-list {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 10px;
+            }
+
+            .info-section {
+                padding: 25px 25px 20px;
+            }
+
+            .details-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .hero {
+                padding: 60px 20px;
+            }
+
+            .modal-content, .bookings-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+
+            .booking-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .view-bookings {
+                bottom: 10px;
+                right: 10px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .doctor-name {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>EliteCare</h1>
+        <p>Discover Top-Tier Healthcare Professionals Tailored to Your Needs</p>
+        <a href="#doctors" class="cta-btn"><i class="fas fa-search"></i> Find Your Doctor</a>
+    </section>
+
+    <!-- Enhanced Filter Box with Sorting -->
+    <div class="filter-box">
+        <div class="filter-group">
+            <label for="specFilter"><i class="fas fa-syringe"></i> Specialization:</label>
+            <select id="specFilter">
+                <option value="all">All Specialties</option>
+                <option value="General Physician">General Physician</option>
+                <option value="Cardiologist">Cardiologist</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Neurologist">Neurologist</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="searchQuery"><i class="fas fa-search"></i> Search Doctors:</label>
+            <input type="text" id="searchQuery" placeholder="Name, Degree, Experience..." />
+        </div>
+        <div class="sort-group">
+            <label for="sortBy"><i class="fas fa-sort"></i> Sort By:</label>
+            <select id="sortBy">
+                <option value="name">Name</option>
+                <option value="rating">Rating</option>
+                <option value="fee">Fee</option>
+                <option value="experience">Experience</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Doctor List -->
+    <div class="doctor-list" id="doctors">
+        <div class="container" data-spec="General Physician" data-search-data="adithya general physician mbbs ms 6 years 500" data-rating="4.1" data-fee="500" data-exp="6" data-name="adithya">
+            <div class="availability online">Online Now</div>
+            <div class="avatar-box">
+                <img src="doctor_adithya.jpg" alt="Dr. Adithya">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Adithya</h3>
+                <div class="specialization">General Physician</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.1</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MS</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>6 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹500 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Adithya', 'General Physician', 500)">Book Appointment</button>
+            </div>
+        </div>
+
+        <div class="container" data-spec="Cardiologist" data-search-data="ravi kumar cardiologist mbbs md 10 years 950" data-rating="4.8" data-fee="950" data-exp="10" data-name="ravi kumar">
+            <div class="availability offline">Offline</div>
+            <div class="avatar-box">
+                <img src="doctor_ravi.jpg" alt="Dr. Ravi Kumar">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Ravi Kumar</h3>
+                <div class="specialization">Cardiologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.8</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MD</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>10 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹950 <span>/ Consult</span>
+                </div>
+                <button class="book-btn disabled-btn" disabled>Fully Booked Today</button>
+            </div>
+        </div>
+
+        <div class="container" data-spec="Dermatologist" data-search-data="priya sharma dermatologist mbbs dnb 8 years 700" data-rating="4.3" data-fee="700" data-exp="8" data-name="priya sharma">
+            <div class="availability online">Online Now</div>
+            <div class="avatar-box">
+                <img src="doctor_priya.jpg" alt="Dr. Priya Sharma">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Priya Sharma</h3>
+                <div class="specialization">Dermatologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.3</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, DNB</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>8 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹700 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Priya Sharma', 'Dermatologist', 700)">Book Appointment</button>
+            </div>
+        </div>
+
+        <div class="container" data-spec="Neurologist" data-search-data="karan raj neurologist mbbs ms 5 years 850" data-rating="4.0" data-fee="850" data-exp="5" data-name="karan raj">
+            <div class="availability online">Online Now</div>
+            <div class="avatar-box">
+                <img src="doctor_karan.jpg" alt="Dr. Karan Raj">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Karan Raj</h3>
+                <div class="specialization">Neurologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.0</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MS</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>5 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹850 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Karan Raj', 'Neurologist', 850)">Book Appointment</button>
+            </div>
+        </div>
+        
+        <div class="container" data-spec="General Physician" data-search-data="sneha mehta general physician mbbs md 7 years 550" data-rating="4.2" data-fee="550" data-exp="7" data-name="sneha mehta">
+            <div class="availability busy">Busy</div>
+            <div class="avatar-box">
+                <img src="doctor_sneha.jpg" alt="Dr. Sneha Mehta">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Sneha Mehta</h3>
+                <div class="specialization">General Physician</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.2</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MD</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>7 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹550 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Sneha Mehta', 'General Physician', 550)">Book Appointment</button>
+            </div>
+        </div>
+
+        <div class="container" data-spec="Cardiologist" data-search-data="amit singh cardiologist mbbs ms 12 years 1000" data-rating="4.6" data-fee="1000" data-exp="12" data-name="amit singh">
+            <div class="availability online">Online Now</div>
+            <div class="avatar-box">
+                <img src="doctor_amit.jpg" alt="Dr. Amit Singh">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Amit Singh</h3>
+                <div class="specialization">Cardiologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.6</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MS</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>12 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹1000 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Amit Singh', 'Cardiologist', 1000)">Book Appointment</button>
+            </div>
+        </div>
+        
+        <div class="container" data-spec="Dermatologist" data-search-data="ritu kapoor dermatologist mbbs dnb 9 years 750" data-rating="4.5" data-fee="750" data-exp="9" data-name="ritu kapoor">
+            <div class="availability online">Online Now</div>
+            <div class="avatar-box">
+                <img src="doctor_ritu.jpg" alt="Dr. Ritu Kapoor">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Ritu Kapoor</h3>
+                <div class="specialization">Dermatologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.5</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, DNB</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>9 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹750 <span>/ Consult</span>
+                </div>
+                <button class="book-btn" onclick="openModal('Dr. Ritu Kapoor', 'Dermatologist', 750)">Book Appointment</button>
+            </div>
+        </div>
+
+        <div class="container" data-spec="Neurologist" data-search-data="vishal kumar neurologist mbbs ms 6 years 900" data-rating="4.1" data-fee="900" data-exp="6" data-name="vishal kumar">
+            <div class="availability offline">Offline</div>
+            <div class="avatar-box">
+                <img src="doctor_vishal.jpg" alt="Dr. Vishal Kumar">
+            </div>
+            <div class="info-section">
+                <h3 class="doctor-name">Dr. Vishal Kumar</h3>
+                <div class="specialization">Neurologist</div>
+                
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <i class="fas fa-star"></i>
+                        <strong>4.1</strong>
+                        <div class="detail-label">Avg. Rating</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <strong>MBBS, MS</strong>
+                        <div class="detail-label">Degree</div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <strong>6 Yrs</strong>
+                        <div class="detail-label">Experience</div>
+                    </div>
+                </div>
+                
+                <div class="fee">
+                    ₹900 <span>/ Consult</span>
+                </div>
+                <button class="book-btn disabled-btn" disabled>Book Tomorrow</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalDoctorName">Book Appointment</h2>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="patientName">Your Name</label>
+                        <input type="text" id="patientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentDate">Preferred Date</label>
+                        <input type="date" id="appointmentDate" required min="2025-10-20">
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentTime">Preferred Time</label>
+                        <select id="appointmentTime" required>
+                            <option value="">Select Time</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="symptoms">Brief Symptoms/Reason</label>
+                        <textarea id="symptoms" rows="3" placeholder="Describe your concern..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBookingBtn">Confirm Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings List Modal -->
+    <div id="bookingsModal" class="bookings-modal">
+        <div class="bookings-content">
+            <div class="bookings-header">
+                <h2>My Bookings</h2>
+                <span class="close" onclick="closeBookingsModal()">&times;</span>
+            </div>
+            <div class="bookings-list" id="bookingsList">
+                <!-- Bookings will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Bookings Button -->
+    <button class="view-bookings" onclick="openBookingsModal()" title="View My Bookings">
+        <i class="fas fa-calendar-check"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 EliteCare. All rights reserved. | Designed for Excellence in Healthcare.</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp, Timestamp, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKd59GeEC9TUZYKWjouyfppRwnkJSxxUQ",
+            authDomain: "appo-e6f45.firebaseapp.com",
+            projectId: "appo-e6f45",
+            storageBucket: "appo-e6f45.appspot.com",
+            messagingSenderId: "123701876241",
+            appId: "1:123701876241:web:201c7e2ccb0c2ca6f703b0",
+            measurementId: "G-B39GZ9YB22"
+        };
+
+        // Enhanced Filter and Sort Logic
+        const specFilter = document.getElementById('specFilter');
+        const searchQuery = document.getElementById('searchQuery');
+        const sortBy = document.getElementById('sortBy');
+        const containers = document.querySelectorAll('.container');
+        let allDoctors = Array.from(containers);
+
+        let app, db, auth, userId = null;
+        const appointmentsCollectionPath = "appointments";
+        const form = document.getElementById('bookingForm');
+        const bookingsList = document.getElementById('bookingsList');
+        const submitBookingBtn = document.getElementById('submitBookingBtn');
+
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to apply filters and sort
+        function applyFiltersAndSort() {
+            const selectedSpec = specFilter.value;
+            const query = searchQuery.value.toLowerCase().trim();
+            const sortValue = sortBy.value;
+
+            let filteredDoctors = allDoctors.filter(container => {
+                const doctorSpec = container.getAttribute('data-spec');
+                const searchData = container.getAttribute('data-search-data');
+                const specMatch = (selectedSpec === 'all' || doctorSpec === selectedSpec);
+                const searchMatch = (query === '' || searchData.includes(query));
+                return specMatch && searchMatch;
+            });
+
+            // Sort the filtered doctors
+            filteredDoctors.sort((a, b) => {
+                let aVal, bVal;
+                switch (sortValue) {
+                    case 'name':
+                        aVal = a.getAttribute('data-name');
+                        bVal = b.getAttribute('data-name');
+                        break;
+                    case 'rating':
+                        aVal = parseFloat(a.getAttribute('data-rating'));
+                        bVal = parseFloat(b.getAttribute('data-rating'));
+                        break;
+                    case 'fee':
+                        aVal = parseInt(a.getAttribute('data-fee'));
+                        bVal = parseInt(b.getAttribute('data-fee'));
+                        break;
+                    case 'experience':
+                        aVal = parseInt(a.getAttribute('data-exp'));
+                        bVal = parseInt(b.getAttribute('data-exp'));
+                        break;
+                    default:
+                        return 0;
+                }
+                return aVal > bVal ? 1 : -1;
+            });
+
+            // Hide all and show filtered/sorted
+            containers.forEach(container => {
+                container.classList.add('hidden');
+                container.style.display = 'none';
+            });
+
+            filteredDoctors.forEach((container, index) => {
+                setTimeout(() => {
+                    container.style.display = 'flex';
+                    container.classList.remove('hidden');
+                }, index * 100); // Staggered animation
+            });
+        }
+
+        // Event listeners
+        specFilter.addEventListener('change', applyFiltersAndSort);
+        sortBy.addEventListener('change', applyFiltersAndSort);
+        searchQuery.addEventListener('input', debounce(applyFiltersAndSort, 300));
+
+        // Initial application
+        applyFiltersAndSort();
+
+        // Modal Functions
+        let currentDoctor = '';
+
+        function openModal(doctorName, specialty, fee) {
+            document.getElementById('modalDoctorName').textContent = `Book with ${doctorName}`;
+            currentDoctor = `${doctorName} - ${specialty} (₹${fee})`;
+            document.getElementById('bookingModal').style.display = 'block';
+            // Reset form
+            form.reset();
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        // Bookings Modal Functions
+        function openBookingsModal() {
+            if (userId) {
+                setupRealtimeListener();
+            }
+            document.getElementById('bookingsModal').style.display = 'block';
+        }
+
+        function closeBookingsModal() {
+            document.getElementById('bookingsModal').style.display = 'none';
+        }
+
+        // Firebase Initialization
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log('User signed in:', userId);
+                    } else {
+                        console.log('No user signed in');
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                alert('Failed to initialize database. Bookings will not be saved.');
+            }
+        }
+
+        // Function to add a booking to Firebase
+        async function addBooking(doctorInfo, patientName, date, time, symptoms) {
+            if (!db || !userId) {
+                alert('Database not ready. Please try again.');
+                return;
+            }
+
+            submitBookingBtn.disabled = true;
+            submitBookingBtn.textContent = 'Saving...';
+
+            try {
+                const appointmentDateTime = new Date(`${date}T${time}:00`);
+                const newAppointment = {
+                    doctor: doctorInfo,
+                    patientName: patientName,
+                    date: date,
+                    time: time,
+                    symptoms: symptoms || 'General consultation',
+                    dateTime: Timestamp.fromDate(appointmentDateTime),
+                    bookedAt: serverTimestamp(),
+                    bookedBy: userId,
+                    status: 'confirmed'
+                };
+                await addDoc(collection(db, appointmentsCollectionPath), newAppointment);
+                alert(`Booking confirmed for ${doctorInfo} on ${date} at ${time}! It's now visible in your bookings and saved securely. We'll contact you soon.`);
+                closeModal();
+                form.reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert(`Booking failed: ${error.message}`);
+            } finally {
+                submitBookingBtn.disabled = false;
+                submitBookingBtn.textContent = 'Confirm Booking';
+            }
+        }
+
+        // Setup real-time listener for user's bookings
+        function setupRealtimeListener() {
+            if (!db || !userId) return;
+
+            const q = query(
+                collection(db, appointmentsCollectionPath),
+                where('bookedBy', '==', userId),
+                where('dateTime', '>=', Timestamp.now()),
+                orderBy('dateTime')
+            );
+
+            onSnapshot(q, (snapshot) => {
+                renderBookings(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            }, (error) => {
+                console.error("Error listening to bookings: ", error);
+                bookingsList.innerHTML = '<div class="no-bookings"><p>Error loading bookings.</p></div>';
+            });
+        }
+
+        // Function to render bookings in the modal
+        function renderBookings(bookingsData) {
+            const list = bookingsList;
+            if (bookingsData.length === 0) {
+                list.innerHTML = '<div class="no-bookings"><i class="fas fa-calendar-times" style="font-size: 3em; color: var(--text-color-light); margin-bottom: 10px;"></i><p>No bookings yet. Book an appointment to get started!</p></div>';
+                return;
+            }
+
+            list.innerHTML = bookingsData.map(booking => {
+                const dateStr = booking.dateTime.toDate().toLocaleDateString();
+                const timeStr = booking.dateTime.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="booking-item">
+                        <div class="booking-details">
+                            <strong>${booking.doctor}</strong>
+                            <div class="booking-meta">
+                                Patient: ${booking.patientName} | Date: ${booking.date} at ${booking.time} | Booked: ${dateStr}
+                            </div>
+                            <div class="booking-meta" style="font-style: italic; margin-top: 5px;">${booking.symptoms}</div>
+                        </div>
+                        <button class="delete-btn" onclick="cancelBooking('${booking.id}')">Cancel</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Function to cancel a booking (delete from Firebase)
+        async function cancelBooking(bookingId) {
+            if (!db) return;
+            try {
+                // Note: In a real app, you might want to soft-delete or update status instead of delete
+                await deleteDoc(doc(db, appointmentsCollectionPath, bookingId));
+                alert('Booking cancelled successfully.');
+            } catch (error) {
+                console.error("Error canceling booking: ", error);
+                alert('Failed to cancel booking.');
+            }
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const patientName = document.getElementById('patientName').value.trim();
+            const date = document.getElementById('appointmentDate').value;
+            const time = document.getElementById('appointmentTime').value;
+            const symptoms = document.getElementById('symptoms').value.trim();
+
+            if (patientName && date && time) {
+                addBooking(currentDoctor, patientName, date, time, symptoms);
+            } else {
+                alert('Please fill in all required fields.');
+            }
+        });
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            const bookingModal = document.getElementById('bookingModal');
+            const bookingsModal = document.getElementById('bookingsModal');
+            if (event.target === bookingModal) {
+                closeModal();
+            }
+            if (event.target === bookingsModal) {
+                closeBookingsModal();
+            }
+        }
+
+        // Smooth scroll to doctors
+        document.querySelector('.cta-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('doctors').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeBookingsModal();
+            }
+        });
+
+        // Make functions global for onclick handlers
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.openBookingsModal = openBookingsModal;
+        window.closeBookingsModal = closeBookingsModal;
+        window.cancelBooking = cancelBooking;
+
+        // Initialize Firebase on load
+        window.onload = async function() {
+            await initializeFirebase();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital Portal - Donation Eligibility Check</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* BASE STYLES - Copied from original for consistency */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f7fa;
+            color: #02475b;
+            overflow-x: hidden;
+            padding-top: 105px; /* Space for the sticky header (reduced) */
+        }
+        .modal-open {
+            overflow: hidden;
+        }
+
+        /* --- STICKY HEADER CONTAINER (Light & Minimal) --- */
+        .header-container {
+            position: fixed;
+            top: 0;
+            width: 99%;
+            z-index: 999;
+            background-color: #fff; /* Solid white background */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            margin: 0 auto;
+            transition: all 0.3s;
+            border-radius: 15px;
+        }
+
+
+        .navbar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff;
+            padding: 12px 3vw;
+            gap: 20px;
+            max-width: 95%;
+            margin: 0 auto;
+            border-radius:20px;
+            transition: all 0.3s;
+        }
+
+        .logo {
+             /* Ensures logo space is maintained if text is used, or to align other elements */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #02475b;
+            padding: 0 10px;
+        }
+        .logo img {
+            height: 48px; /* Slightly smaller logo */
+            width: 44px;
+            border-radius: 6px;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .logo img:hover { transform: scale(1.05); }
+
+        .location-wrapper {
+            position: relative;
+            min-width: 170px;
+        }
+        .location-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: #eaf3f5; /* Light background */
+            color: #02475b;
+            padding: 7px 16px; /* Tighter padding */
+            border-radius: 18px; /* Softer pill shape */
+            font-weight: 500; font-size: 0.9rem;
+            border: 1px solid #d4e8ec; /* Faint border for depth */
+            transition: all 0.2s;
+            cursor: pointer;
+            justify-content: space-between; /* Added to space items */
+        }
+        .location-pill:hover {
+            background: #d8edf0;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .location-pill i { color: #02475b;font-size: 1.0em;}
+
+        /* NEW: Style for the location text span and toggle button */
+        .location-pill > span {
+            flex-grow: 1;
+            text-align: left;
+            min-width: 100px;
+        }
+
+        .location-pill button {
+            background: transparent;
+            border: none;
+            color: #02475b;
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 0 0 0 5px;
+            margin: 0;
+            outline: none;
+            transition: color 0.1s;
+        }
+        .location-pill button:hover {
+            color: #04677f;
+        }
+
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 40px; /* Adjusted position */
+            left: 0;
+            width: 100%;
+            background: #fff; border: 1px solid #cdebf3;
+            border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            overflow: hidden;
+        }
+        .dropdown select {
+            width: 100%; font-size:15px; padding:10px; border-radius:0; border:none; color:#02475b;
+            outline: none; cursor: pointer;
+        }
+
+        .search-pill {
+            display: flex; align-items: center;
+            background: #f6fafc;
+            border-radius: 18px;
+            border: 1px solid #e1e7ec;
+            box-shadow: none;
+            max-width: 400px;
+            width: 100%;
+            padding: 7px 14px;
+            transition: all 0.2s ease-in-out;
+        }
+        .search-pill:hover, .search-pill:focus-within {
+            box-shadow: 0 0 0 2px #12d8c566;
+            border-color: #12d8c5;
+        }
+        .search-pill .fa-magnifying-glass {
+            font-size: 0.95rem; color: #7bbdd6; margin-right: 8px;
+        }
+        .search-pill input {
+            border: none; background: transparent; font-size: 0.95rem;
+            outline: none; color: #02475b;
+            width: 100%;
+        }
+        .search-pill input::placeholder { color: #95a1be;}
+
+        /* LOGIN/USER PILLS */
+        .login-pill, .user-pill {
+            display: flex; align-items: center; gap: 6px;
+            font-weight: 600; font-size: 0.95rem;
+            border-radius: 20px; padding: 8px 20px;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: none;
+        }
+        .login-pill {
+            border: 2px solid #02475b; /* Dark primary border */
+            background: #fff;
+            color: #02475b;
+        }
+        .login-pill a { color: #02475b; }
+        .login-pill:hover { background-color: #02475b; color: #ffffff; border-color: #02475b;
+            box-shadow: 0 4px 10px rgba(0, 71, 91, 0.2);
+        }
+        .login-pill:hover a{ color: #ffffff;}
+
+        .user-pill {
+            display: none;
+            background: #02475b;
+            color: #ffffff;
+            border: 2px solid #02475b;
+        }
+        .user-pill:hover {
+            background-color: #04677f;
+        }
+        .user-pill .fa-circle-user { font-size: 1.1em; color: #fff;}
+        .user-dropdown {
+            display: none; position: absolute; top: 100%; right: 0;
+            background: #fff; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-top: 8px; width: 160px; z-index: 100; overflow: hidden;
+        }
+        .user-dropdown a {
+            display: block; padding: 8px 12px; color: #02475b; text-decoration: none;
+            font-size: 0.9rem; font-weight: 500; transition: background 0.1s;
+        }
+        .user-dropdown a:hover { background: #eafbff; }
+
+        /* --- 2. BOTTOM NAVIGATION BAR (Links) --- */
+        .bottom-navbar {
+            background: #fdfdfd; /* Pure white or nearly white for separation */
+            border-radius: 0;
+            max-width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Minimal shadow for depth */
+        }
+        .bottom-navbar ul {
+            display: flex; justify-content: center; align-items: center; gap: 35px;
+            padding: 8px 0; /* Very minimal padding */
+            margin: 0; list-style: none;
+        }
+        .bottom-navbar ul li a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #0e404b;
+            text-decoration: none; letter-spacing:0.3px;
+            border-radius: 10px;
+            padding: 6px 8px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .bottom-navbar ul li a:hover {
+            background-color: #02475b; /* Light hover background */
+            color: #ffffff;
+        }
+        /* Active link for this page */
+        .bottom-navbar ul li a[href="#donation"] {
+             background-color: #02475b;
+             color: #ffffff;
+        }
+
+
+        /* --- NEW STYLES for Eligibility Page --- */
+        .hero {
+            text-align: center; margin: 70px auto 0 auto;
+            background: linear-gradient(135deg, #f8fbfd 0%, #e6f3f5 100%);
+            padding: 82px 5vw 60px 5vw; border-radius: 20px; width: 90%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); animation: fadeIn 1.2s; max-width: 1000px; position: relative;
+        }
+        .hero h1 { font-size: 3.3rem; color: #02475b; margin-bottom: 18px; }
+        .hero p { font-size: 1.14rem; color: #05596b; margin-bottom: 14px; letter-spacing: .2px; }
+        .btn-row { display: flex; justify-content: center; gap: 14px; margin-top: 32px; }
+        .hero .A8, .hero .A9 {
+            font-size: 1.12rem; margin: 10px 0; padding: 15px 36px; border-radius: 32px;
+            border: none; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 3px 9px #e3efff88; letter-spacing: 0.5px;
+            text-decoration: none;
+        }
+        .hero .A8 { background-color: #02475b; color: #ffffff; }
+        .hero .A8:hover {
+            background-color: #04677f; box-shadow: 0px 6px 12px rgba(0, 71, 91, 0.2);
+            transform: translateY(-3px);
+        }
+        .hero .A9 {
+            background-color: #ffffff; color: #02475b; border: 2px solid #02475b;
+        }
+        .hero .A9 a { color: #02475b; text-decoration: none; }
+        .hero .A9:hover {
+            background-color: #02475b; color: #ffffff; transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.13);
+        }
+        .hero .A9:hover a { color: #ffffff; }
+
+
+        /* Eligibility Section */
+        .eligibility-section { max-width: 1000px; margin: 60px auto 0 auto; padding: 0 5vw; }
+        .eligibility-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 40px; margin-top: 30px;
+        }
+        .eligibility-card {
+            background: #fff; border-radius: 18px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            transition: box-shadow 0.2s;
+            border-top: 5px solid #ff5757; /* Blood Red Accent */
+        }
+        .eligibility-card.organ-eligibility {
+            border-top: 5px solid #12d8c5; /* Organ Teal Accent */
+        }
+        .eligibility-card h2 {
+            font-size: 1.8rem; font-weight: 700; color: #02475b; margin-bottom: 20px;
+            border-bottom: 2px solid rgba(2, 71, 91, 0.1); padding-bottom: 10px;
+        }
+        .eligibility-list {
+            list-style: none; padding: 0;
+        }
+        .eligibility-list li {
+            font-size: 1.05rem; color: #04677f; margin-bottom: 15px;
+            display: flex; align-items: flex-start;
+        }
+        .eligibility-list i {
+            margin-right: 15px; font-size: 1.2em;
+        }
+        .required i { color: #04677f; }
+        .excluded i { color: #ff5757; }
+        .organ-eligibility .required i { color: #12d8c5; }
+        .organ-eligibility .excluded i { color: #ff5757; }
+
+
+        /* CTA Section styles (Reused from original) */
+        .cta-section {
+            margin:90px auto 0 auto; background: linear-gradient(90deg,#eafdff 0%,#f8fbfd 100%);
+            border-radius:18px; box-shadow: 0 6px 24px #1273de11; max-width:800px;
+            text-align:center; padding:48px 13vw 42px 13vw;
+        }
+        .cta-section h2 { font-size:2.1rem; color:#02475b; margin-bottom:18px; font-weight:700; }
+        .cta-section p { color:#04677f; font-size:1.13rem; margin-bottom:32px; }
+        .cta-section .cta-btn {
+            background:#ff5757; color:#fff; font-size:1.08rem; border:none;border-radius:32px;
+            padding:16px 48px; font-weight:600; cursor:pointer; box-shadow:0 3px 9px rgba(255, 87, 87, 0.4);
+            transition:background 0.17s;
+        }
+        .cta-section .cta-btn:hover { background:#e04444;}
+
+        /* Footer styles (Reused from original) */
+        .footer {
+            background:#fff; color:#02475b; padding:44px 8vw 24px 8vw; text-align:center;
+            border-radius: 0 0 24px 24px; box-shadow:0 -2px 16px #1273de06;
+            font-size:1.08rem; margin-top:60px;
+        }
+        .footer .socials { margin: 18px 0 0 0;}
+        .footer .socials a {
+            color:#02475b; margin:0 14px; font-size:1.35rem;transition:color 0.23s;
+        }
+        .footer .socials a:hover { color: #165d59;}
+
+        /* Modal styles (Copied verbatim for functionality) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); z-index: 1000; display: none;
+            justify-content: center; align-items: flex-start; padding-top: 50px;
+        }
+
+        .login-modal, .signup-modal {
+            position: fixed; left: 30%; top: 15%; width: 400px; max-width: 90%;
+            background: #ffffff; border-radius: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px; animation: slideIn 0.3s ease-out; z-index: 1001;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { color: #02475b; font-size: 1.8rem; margin: 0; }
+        .close-btn { font-size: 2rem; font-weight: 300; color: #7bbdd6; cursor: pointer; transition: color 0.1s; }
+        .close-btn:hover { color: #02475b; }
+        .form-group { margin-bottom: 18px; }
+        .login-form label, .signup-form label {
+            display: block; margin-bottom: 8px; font-weight: 600;
+            color: #05596b; font-size: 1rem;
+        }
+
+        .login-form input, .signup-form input {
+            width: 100%; padding: 12px 15px; border: 1px solid #cdebf3;
+            border-radius: 8px; font-size: 1rem; color: #02475b;
+            transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box;
+        }
+        .login-form input:focus, .signup-form input:focus {
+            border-color: #12d8c5; box-shadow: 0 0 0 3px #12d8c530; outline: none;
+        }
+        .submit-btn {
+            width: 100%; background-color: #02475b; color: #ffffff; font-size: 1.1rem;
+            font-weight: 600; padding: 14px; border: none; border-radius: 32px;
+            cursor: pointer; margin-top: 10px; transition: background-color 0.17s, transform 0.1s;
+        }
+        .submit-btn:hover { background-color: #04677f; transform: translateY(-1px); }
+        .form-footer { text-align: center; margin-top: 15px; }
+        .form-footer a { color: #17646f; font-size: 0.95rem; text-decoration: none; cursor: pointer; }
+        .form-footer a:hover { text-decoration: underline; }
+        .error-message {
+            color: #d9534f; background: #f2dede; border: 1px solid #ebccd1;
+            padding: 8px 12px; border-radius: 6px; margin-top: 15px;
+            font-size: 0.95rem; font-weight: 500; text-align: center;
+        }
+
+        /* Responsive Media Queries (Reused from original) */
+        @media (max-width:900px) {
+            .navbar { padding: 13px 2vw; margin: 0 auto; max-width: 96%;}
+            .search-pill { min-width: 160px; max-width: 98vw;}
+            .bottom-navbar { margin: 0 auto; max-width: 96%;}
+            .bottom-navbar ul { gap:22px;}
+            .eligibility-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width:650px){
+            body { padding-top: 170px; }
+            .navbar { flex-direction: column; gap:16px;}
+            .bottom-navbar ul { gap: 9px; flex-wrap: wrap;}
+            .location-wrapper, .search-pill, .login-pill, .user-pill { margin: 0 auto; width: 90%;}
+            .hero, .eligibility-section, .cta-section { padding: 22px 3vw;}
+            .login-modal, .signup-modal { left: 5%; top: 50px; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Am I Eligible to Donate?</h1>
+        <p>Before you commit to the life-saving act of donation, please review the current medical and legal guidelines.</p>
+        <p>Eligibility is crucial to ensure the safety of both the donor and the recipient. If unsure, please consult a specialist.</p>
+        <div class="btn-row">
+            <button class="A8">Talk to a Donation Counselor</button>
+            <button class="A9"><a href="donate.html">Back to Donation Overview</a></button>
+        </div>
+    </div>
+
+    <section class="eligibility-section">
+        <div class="eligibility-grid">
+            
+            <div class="eligibility-card">
+                <h2><i class="fa-solid fa-droplet" style="color:#ff5757;"></i> Blood Donation Requirements</h2>
+                <ul class="eligibility-list">
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Age:</strong> Must be between 18 and 65 years old.
+                    </li>
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Weight:</strong> Minimum of 50 kg (110 lbs).
+                    </li>
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Hemoglobin:</strong> Minimum level required (12.5 g/dl for women, 13.0 g/dl for men).
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Cannot have donated in the last 8 weeks (56 days).
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Must be free from cold, flu, fever, or active infection.
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Cannot be taking certain medications (e.g., specific antibiotics, blood thinners).
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="eligibility-card organ-eligibility">
+                <h2><i class="fa-solid fa-hands-holding-heart" style="color:#12d8c5;"></i> Organ Donation Pledging</h2>
+                <ul class="eligibility-list">
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Age:</strong> Must be 18 years or older to legally consent.
+                    </li>
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Consent:</strong> Requires explicit registration and family awareness/support.
+                    </li>
+                    <li class="required">
+                        <i class="fa-solid fa-check-circle"></i> 
+                        <strong>Medical Review:</strong> Final donation eligibility is determined by doctors at the time of death.
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Major contraindications include HIV, active cancer, or systemic infection.
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Specific chronic diseases (e.g., severe heart failure) may exclude some organs.
+                    </li>
+                    <li class="excluded">
+                        <i class="fa-solid fa-times-circle"></i> 
+                        Pledging does not require a health check now, only your legal consent.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Ready to Make a Life-Saving Choice?</h2>
+        <p>If you meet the preliminary criteria, please proceed to registration. If you have questions about specific medical conditions, contact our team.</p>
+        <button class="cta-btn"><a href="dregister.html">I Meet the Criteria - Start Registration</a></button>
+    </section>
+
+    <footer class="footer">
+        <div>
+            Your Hospital – Caring for you, always.<br>
+            <div style="margin-top:11px;">Call us: <b>+91 90000 00000</b> | Email: <b>contact@yourhospital.com</b></div>
+        </div>
+        <div class="socials">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <div style="margin-top:18px;opacity:.75;font-size:.98em;">
+            © 2025 Your Hospital. All Rights Reserved.
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="loginModalOverlay">
+        <div class="login-modal">
+            <div class="modal-header">
+                <h2>Patient Login</h2>
+                <span class="close-btn login-close-btn">&times;</span>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Email or Phone:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="submit-btn">Login Securely</button>
+                <div class="error-message" id="loginErrorMessage" style="display:none;"></div>
+                <div class="form-footer">
+                    New User? <a id="showSignupLink">Sign Up Here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="signupModalOverlay" style="display:none;">
+        <div class="signup-modal">
+            <div class="modal-header">
+                <h2>Register New Account</h2>
+                <span class="close-btn signup-close-btn">&times;</span>
+            </div>
+            <form class="signup-form" id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email:</label>
+                    <input type="email" id="signupEmail" name="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password:</label>
+                    <input type="password" id="signupPassword" name="signupPassword" required minlength="6">
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+                <div class="error-message" id="signupErrorMessage" style="display:none;"></div>
+                <div class="form-footer">
+                    Already have an account? <a id="showLoginLink">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // 🛑 IMPORTANT: REPLACE THIS WITH YOUR ACTUAL GOOGLE MAPS PLATFORM KEY 🛑
+        const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIGxImEMAlJn_LvTD6XLs4DRAfeW6-784",
+            authDomain: "user-autrhentication.firebaseapp.com",
+            projectId: "user-autrhentication",
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
+        const loginButton = document.getElementById('loginButton');
+        const userPill = document.getElementById('userPill');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+        const userDropdown = document.getElementById('userDropdown');
+        const logoutLink = document.getElementById('logoutLink');
+        const loginModalOverlay = document.getElementById('loginModalOverlay');
+        const signupModalOverlay = document.getElementById('signupModalOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginErrorMessage = document.getElementById('loginErrorMessage');
+        const signupEmailInput = document.getElementById('signupEmail');
+        const signupPasswordInput = document.getElementById('signupPassword');
+        const signupErrorMessage = document.getElementById('signupErrorMessage');
+        const loginCloseBtn = document.querySelector('.login-close-btn');
+        const signupCloseBtn = document.querySelector('.signup-close-btn');
+        const showSignupLink = document.getElementById('showSignupLink');
+        const showLoginLink = document.getElementById('showLoginLink');
+
+
+        // Global variables for location data and display state
+        let currentCity = "Detecting...";
+        let currentLatitude = null;
+        let currentLongitude = null;
+        let isShowingCity = true;
+
+        const locationText = document.getElementById("locationText");
+        const locationDropdown = document.getElementById("locationDropdown");
+        const citySelect = document.getElementById("citySelect");
+        const locationPill = document.getElementById('location');
+        const locationToggleBtn = document.getElementById('locationToggleBtn');
+
+        function clearLoginError() {
+            loginErrorMessage.textContent = '';
+            loginErrorMessage.style.display = 'none';
+        }
+
+        function setLoginError(message) {
+            loginErrorMessage.textContent = message;
+            loginErrorMessage.style.display = 'block';
+        }
+
+        function clearSignupError() {
+            signupErrorMessage.textContent = '';
+            signupErrorMessage.style.display = 'none';
+        }
+
+        function setSignupError(message) {
+            signupErrorMessage.textContent = message;
+            signupErrorMessage.style.display = 'block';
+        }
+
+        function updateUIAfterAuth(user) {
+            if (user) {
+                loginButton.style.display = 'none';
+                userPill.style.display = 'flex';
+                const displayName = user.email ? user.email.split('@')[0] : 'User';
+                userEmailDisplay.textContent = displayName;
+            } else {
+                loginButton.style.display = 'flex';
+                userPill.style.display = 'none';
+                userDropdown.style.display = 'none';
+            }
+        }
+
+        function toggleUserDropdown() {
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showLoginModal(event) {
+            if (event) event.preventDefault();
+            signupModalOverlay.style.display = 'none';
+            loginModalOverlay.style.display = 'flex';
+            document.body.classList.add('modal-open');
+            clearLoginError();
+            signupForm.reset();
+        }
+
+        function hideLoginModal() {
+            loginModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            loginForm.reset();
+            clearLoginError();
+        }
+
+        function hideAllModals() {
+            hideLoginModal();
+            hideSignupModal();
+        }
+
+        function showSignupModal(event) {
+            if (event) event.preventDefault();
+            loginModalOverlay.style.display = 'none';
+            signupModalOverlay.style.display = 'flex';
+            document.body.classList.add('modal-open');
+            clearSignupError();
+            loginForm.reset();
+        }
+
+        function hideSignupModal() {
+            signupModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            signupForm.reset();
+            clearSignupError();
+        }
+
+        // --- Location Logic Update: Using Google Geocoding API ---
+
+        /**
+         * Parses Google Geocoding API results to find the most specific city/locality name.
+         */
+        function getCityFromGoogleResponse(data) {
+            if (!data.results || data.results.length === 0) {
+                return "Detected Location";
+            }
+
+            // Look for 'locality' (city/town) or 'administrative_area_level_1' (state/region)
+            for (const result of data.results) {
+                for (const component of result.address_components) {
+                    if (component.types.includes('locality')) {
+                        return component.long_name;
+                    }
+                    if (component.types.includes('administrative_area_level_1') && component.types.includes('political')) {
+                        return component.long_name;
+                    }
+                }
+            }
+
+            // Fallback to the first part of the formatted address
+            return data.results[0].formatted_address.split(',')[0] || "Detected Location";
+        }
+
+        function toggleLocationDisplay(event) {
+            // Prevent the toggle button from showing the dropdown
+            if (event) event.stopPropagation();
+
+            if (currentLatitude !== null && currentLongitude !== null) {
+                isShowingCity = !isShowingCity;
+
+                if (isShowingCity) {
+                    locationText.textContent = currentCity;
+                } else {
+                    locationText.textContent = Lat: ${currentLatitude.toFixed(4)}, Lon: ${currentLongitude.toFixed(4)};
+                }
+            }
+        }
+
+        function success(position) {
+            currentLatitude = position.coords.latitude;
+            currentLongitude = position.coords.longitude;
+
+            locationToggleBtn.style.display = 'block';
+
+            // Using Google Maps Geocoding API
+            const latlng = ${currentLatitude},${currentLongitude};
+            const googleApiUrl = https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}&key=${GOOGLE_MAPS_API_KEY};
+
+            fetch(googleApiUrl)
+                .then(res => res.json())
+                .then(data => {
+                    currentCity = getCityFromGoogleResponse(data);
+                    isShowingCity = true;
+                    locationText.textContent = currentCity;
+                })
+                .catch(error => {
+                    console.error("Google Geocoding API Error:", error);
+                    currentCity = "Detected Location";
+                    locationText.textContent = currentCity;
+                });
+        }
+
+        function fail() {
+            // Geolocation failed or user denied permission. Default to dropdown.
+            showDropdown();
+        }
+
+        function showDropdown() {
+            currentCity = "Select Location";
+            locationText.textContent = currentCity;
+            locationToggleBtn.style.display = 'none';
+            currentLatitude = null;
+            currentLongitude = null;
+            isShowingCity = true;
+        }
+
+        // --- Event Listeners ---
+
+        auth.onAuthStateChanged((user) => {
+            updateUIAfterAuth(user);
+        });
+
+        loginButton.addEventListener('click', showLoginModal);
+
+        userPill.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleUserDropdown();
+        });
+
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            auth.signOut().then(() => {
+                updateUIAfterAuth(null);
+                userDropdown.style.display = 'none';
+            }).catch((error) => {
+                console.error("Logout Error:", error);
+            });
+        });
+
+        loginCloseBtn.addEventListener('click', hideLoginModal);
+        signupCloseBtn.addEventListener('click', hideSignupModal);
+
+        showSignupLink.addEventListener('click', showSignupModal);
+        showLoginLink.addEventListener('click', showLoginModal);
+
+        document.addEventListener("click", (e) => {
+            if (e.target === loginModalOverlay) { hideLoginModal(); }
+            if (e.target === signupModalOverlay) { hideSignupModal(); }
+
+            if (!userPill.contains(e.target)) {
+                userDropdown.style.display = 'none';
+            }
+        });
+
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const email = usernameInput.value;
+            const password = passwordInput.value;
+            clearLoginError();
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    hideAllModals();
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+
+                    if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password' || errorCode === 'auth/invalid-email') {
+                        setLoginError("Wrong details. Please check your email and password.");
+                    } else {
+                        setLoginError(Login failed. Error: ${error.message});
+                        console.error("Firebase Login Error:", error);
+                    }
+                });
+        });
+
+        signupForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const email = signupEmailInput.value;
+            const password = signupPasswordInput.value;
+            clearSignupError();
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    hideAllModals();
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    let message = "Registration failed.";
+
+                    if (errorCode === 'auth/email-already-in-use') {
+                        message = "This email is already registered. Please login instead.";
+                    } else if (errorCode === 'auth/invalid-email') {
+                        message = "Invalid email format.";
+                    } else if (errorCode === 'auth/weak-password') {
+                        message = "Password must be at least 6 characters long.";
+                    } else {
+                        message = Registration failed: ${error.message};
+                    }
+
+                    setSignupError(message);
+                    console.error("Firebase Signup Error:", error);
+                });
+        });
+
+        window.addEventListener("load", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success, fail, { enableHighAccuracy: true, timeout: 5000 });
+            } else {
+                showDropdown();
+            }
+        });
+
+        // Toggle button listener
+        locationToggleBtn.addEventListener('click', toggleLocationDisplay);
+
+        locationPill.addEventListener("click", (e) => {
+            // Only open dropdown if toggle button isn't clicked
+            if (e.target !== locationToggleBtn && !locationToggleBtn.contains(e.target)) {
+                     e.stopPropagation();
+                if (locationDropdown.style.display === "block") {
+                    locationDropdown.style.display = "none";
+                } else {
+                    locationDropdown.style.display = "block";
+                }
+            }
+        });
+
+        citySelect.addEventListener("change", () => {
+            if (citySelect.value) {
+                currentCity = citySelect.value;
+                locationText.textContent = currentCity;
+                locationDropdown.style.display = "none";
+
+                // Hide coordinate feature if user manually selects city
+                locationToggleBtn.style.display = 'none';
+                currentLatitude = null;
+                currentLongitude = null;
+                isShowingCity = true;
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!document.querySelector('.location-wrapper').contains(e.target)) {
+                locationDropdown.style.display = "none";
+            }
+        });
+
+        // CTA button action
+        document.querySelector('.cta-section .cta-btn').addEventListener('click', () => {
+             alert('Proceeding to Donation Registration...');
+             // Redirect or open a registration form.
+        });
+        
+        // Counselor button action
+        document.querySelector('.hero .A8').addEventListener('click', () => {
+             alert('Connecting you to a Donation Counselor now...');
+             // Implement live chat or phone call feature here.
+        });
+    </script>
+</body>
+</html>
