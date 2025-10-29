@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Connection Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .status {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #0056b3; }
+    pre {
+      background: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Supabase Connection Test</h1>
+  
+  <div id="status"></div>
+  
+  <h2>Actions:</h2>
+  <button onclick="testConnection()">1. Test Connection</button>
+  <button onclick="checkTable()">2. Check Table Exists</button>
+  <button onclick="createTable()">3. Create Table (SQL)</button>
+  <button onclick="testInsert()">4. Test Insert</button>
+  <button onclick="testSelect()">5. Test Select</button>
+  
+  <div id="output"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://lqlnyelzdjmhpcywcqch.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxbG55ZWx6ZGptaHBjeXdjcWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NjExMjEsImV4cCI6MjA3NzMzNzEyMX0.ZGUHcTkmt9Y2Wtj44lvzAJM5PKZZ_n-v9hkjoqP_ou8';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+    }
+
+    function showOutput(title, data) {
+      const outputDiv = document.getElementById('output');
+      outputDiv.innerHTML = `<h3>${title}</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+    }
+
+    async function testConnection() {
+      showStatus('Testing Supabase connection...', 'info');
+      try {
+        const { data, error } = await supabase.from('blood_donations').select('count');
+        if (error) {
+          if (error.message.includes('does not exist') || error.code === '42P01') {
+            showStatus('✅ Connection successful! But table "blood_donations" does not exist yet.', 'warning');
+            showOutput('Error Details', error);
+          } else {
+            showStatus('❌ Connection error: ' + error.message, 'error');
+            showOutput('Error Details', error);
+          }
+        } else {
+          showStatus('✅ Connection successful! Table exists and is accessible.', 'success');
+          showOutput('Response', data);
+        }
+      } catch (err) {
+        showStatus('❌ Connection failed: ' + err.message, 'error');
+        showOutput('Error', err);
+      }
+    }
+
+    async function checkTable() {
+      showStatus('Checking if table exists...', 'info');
+      try {
+        const { data, error } = await supabase
+          .from('blood_donations')
+          .select('*')
+          .limit(1);
+        
+        if (error) {
+          if (error.code === '42P01') {
+            showStatus('❌ Table "blood_donations" does NOT exist. Please create it!', 'error');
+            showOutput('Error Code', { code: error.code, message: error.message, hint: error.hint });
+          } else {
+            showStatus('❌ Error: ' + error.message, 'error');
+            showOutput('Error Details', error);
+          }
+        } else {
+          showStatus('✅ Table "blood_donations" exists!', 'success');
+          showOutput('Table Data', data);
+        }
+      } catch (err) {
+        showStatus('❌ Check failed: ' + err.message, 'error');
+        showOutput('Error', err);
+      }
+    }
+
+    function createTable() {
+      showStatus('Copy this SQL and run it in Supabase SQL Editor:', 'warning');
+      const sql = `-- Create blood_donations table
+CREATE TABLE blood_donations (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  hospital VARCHAR(255) NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  blood VARCHAR(10) NOT NULL,
+  units INTEGER NOT NULL,
+  contact VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Create indexes
+CREATE INDEX idx_blood_donations_blood ON blood_donations(blood);
+CREATE INDEX idx_blood_donations_location ON blood_donations(location);
+CREATE INDEX idx_blood_donations_created_at ON blood_donations(created_at DESC);
+
+-- Enable RLS
+ALTER TABLE blood_donations ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Allow public read access" ON blood_donations
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow public insert access" ON blood_donations
+  FOR INSERT WITH CHECK (true);
+
+-- Insert sample data
+INSERT INTO blood_donations (name, hospital, location, blood, units, contact) VALUES
+  ('John Doe', 'Apollo Hospital', 'Hyderabad', 'A+', 12, '040-5551234'),
+  ('Jane Smith', 'Yashoda Hospital', 'Secunderabad', 'O+', 20, '040-6664321'),
+  ('Mike Johnson', 'KIMS Hospital', 'Vijayawada', 'B+', 15, '0866-2345678'),
+  ('Sarah Williams', 'CMC Hospital', 'Guntur', 'A-', 8, '0863-3344556'),
+  ('David Brown', 'NIMS Hospital', 'Hyderabad', 'AB+', 5, '040-7788990'),
+  ('Emily Davis', 'Rainbow Hospital', 'Tirupati', 'O-', 3, '0877-5566778'),
+  ('Robert Miller', 'SVIMS Hospital', 'Tirupati', 'B-', 6, '0877-3322110'),
+  ('Lisa Wilson', 'Care Hospital', 'Guntur', 'AB-', 2, '0863-9988776');`;
+      
+      showOutput('SQL Script (Copy and paste in Supabase SQL Editor)', { sql });
+      
+      // Also show instructions
+      document.getElementById('output').innerHTML += `
+        <div class="status warning" style="margin-top: 20px;">
+          <h3>📋 How to run this SQL:</h3>
+          <ol>
+            <li>Go to <a href="https://supabase.com/dashboard/project/lqlnyelzdjmhpcywcqch/sql/new" target="_blank">Supabase SQL Editor</a></li>
+            <li>Copy the SQL above</li>
+            <li>Paste it in the SQL Editor</li>
+            <li>Click "Run" button</li>
+            <li>Come back here and click "2. Check Table Exists"</li>
+          </ol>
+        </div>
+      `;
+    }
+
+    async function testInsert() {
+      showStatus('Testing insert operation...', 'info');
+      try {
+        const testData = {
+          name: 'Test Donor',
+          hospital: 'Test Hospital',
+          location: 'Test City',
+          blood: 'O+',
+          units: 5,
+          contact: '1234567890'
+        };
+
+        const { data, error } = await supabase
+          .from('blood_donations')
+          .insert([testData])
+          .select();
+
+        if (error) {
+          showStatus('❌ Insert failed: ' + error.message, 'error');
+          showOutput('Error Details', error);
+        } else {
+          showStatus('✅ Insert successful!', 'success');
+          showOutput('Inserted Data', data);
+        }
+      } catch (err) {
+        showStatus('❌ Insert failed: ' + err.message, 'error');
+        showOutput('Error', err);
+      }
+    }
+
+    async function testSelect() {
+      showStatus('Testing select operation...', 'info');
+      try {
+        const { data, error } = await supabase
+          .from('blood_donations')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) {
+          showStatus('❌ Select failed: ' + error.message, 'error');
+          showOutput('Error Details', error);
+        } else {
+          showStatus(`✅ Select successful! Found ${data.length} records.`, 'success');
+          showOutput('Retrieved Data', data);
+        }
+      } catch (err) {
+        showStatus('❌ Select failed: ' + err.message, 'error');
+        showOutput('Error', err);
+      }
+    }
+
+    // Auto test connection on load
+    window.addEventListener('DOMContentLoaded', () => {
+      testConnection();
+    });
+  </script>
+</body>
+</html>

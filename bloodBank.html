@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Bank & Availability System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      animation: gradientShift 10s ease infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Header Styles */
+    header {
+      background: linear-gradient(135deg, #b30000 0%, #8b0000 100%);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      box-shadow: 0 8px 30px rgba(179, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: movePattern 20s linear infinite;
+    }
+
+    @keyframes movePattern {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+      font-size: 2.8rem;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.8s ease-out;
+      font-family: "Playfair Display", serif;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      position: relative;
+      z-index: 1;
+      opacity: 0.95;
+      animation: slideDown 0.8s ease-out 0.2s backwards;
+      font-family: "Inter", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Navigation Styles */
+    nav {
+      background: linear-gradient(135deg, #a00000 0%, #7a0000 100%);
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(160, 0, 0, 0.3);
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: white;
+      color: #b30000;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 28px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    nav button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(179, 0, 0, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    nav button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    nav button:hover {
+      background: #fceaea;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(179, 0, 0, 0.3);
+    }
+
+    nav button:active {
+      transform: translateY(-1px);
+    }
+
+    /* Container Styles */
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      padding: 35px;
+      animation: fadeInUp 0.6s ease-out;
+      position: relative;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      color: #b30000;
+      margin-bottom: 25px;
+      font-size: 2rem;
+      font-weight: 700;
+      position: relative;
+      padding-bottom: 15px;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #b30000, #ff6b6b);
+      border-radius: 2px;
+    }
+
+    /* Quote Styles */
+    .quotes {
+      background: linear-gradient(135deg, #ffeaea 0%, #ffe0e0 100%);
+      border-left: 5px solid #b30000;
+      border-radius: 12px;
+      padding: 20px 25px;
+      margin-bottom: 30px;
+      font-style: italic;
+      color: #660000;
+      text-align: center;
+      font-size: 1.05rem;
+      box-shadow: 0 4px 15px rgba(179, 0, 0, 0.1);
+      animation: pulse 2s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .quotes::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      font-size: 5rem;
+      color: rgba(179, 0, 0, 0.1);
+      font-family: Georgia, serif;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 15px rgba(179, 0, 0, 0.1); }
+      50% { box-shadow: 0 6px 20px rgba(179, 0, 0, 0.2); }
+    }
+
+    /* Blood Group Buttons */
+    .blood-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      padding: 10px;
+    }
+
+    .blood-buttons button {
+      background: linear-gradient(135deg, #b30000 0%, #8b0000 100%);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      padding: 18px;
+      cursor: pointer;
+      font-size: 1.3rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(179, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .blood-buttons button::before {
+      content: '💉';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      font-size: 3rem;
+      opacity: 0.2;
+      transition: all 0.3s ease;
+    }
+
+    .blood-buttons button:hover::before {
+      top: -10px;
+      right: -10px;
+      opacity: 0.4;
+    }
+
+    .blood-buttons button:hover {
+      background: linear-gradient(135deg, #d60000 0%, #a00000 100%);
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(179, 0, 0, 0.4);
+    }
+
+    .blood-buttons button:active {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 25px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: linear-gradient(135deg, #b30000 0%, #8b0000 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    tr {
+      transition: all 0.3s ease;
+    }
+
+    tr:hover {
+      background: #fff8f8;
+      transform: scale(1.01);
+    }
+
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    tr:nth-child(even):hover {
+      background: #fff8f8;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #999;
+      margin-top: 30px;
+      font-size: 1.1rem;
+      padding: 30px;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Compatible Section */
+    .compatible {
+      background: linear-gradient(135deg, #fef2f2 0%, #ffe8e8 100%);
+      border-left: 5px solid #b30000;
+      padding: 15px 20px;
+      margin-top: 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #660000;
+      box-shadow: 0 4px 15px rgba(179, 0, 0, 0.1);
+      animation: slideInLeft 0.5s ease-out;
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Form Styles */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    form input, form select {
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    form input:focus, form select:focus {
+      outline: none;
+      border-color: #b30000;
+      box-shadow: 0 0 0 3px rgba(179, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    form button {
+      background: linear-gradient(135deg, #b30000 0%, #8b0000 100%);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 15px;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(179, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    form button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    form button:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    form button:hover {
+      background: linear-gradient(135deg, #d60000 0%, #a00000 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(179, 0, 0, 0.3);
+    }
+
+    form button:active {
+      transform: translateY(-1px);
+    }
+
+    /* Footer Styles */
+    footer {
+      text-align: center;
+      padding: 25px;
+      background: linear-gradient(135deg, #b30000 0%, #8b0000 100%);
+      color: white;
+      margin-top: 50px;
+      box-shadow: 0 -4px 20px rgba(179, 0, 0, 0.3);
+    }
+
+    footer p {
+      margin: 8px 0;
+      font-size: 1rem;
+      font-family: "Inter", sans-serif;
+    }
+
+    footer p:first-child {
+      font-size: 1.2rem;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hidden Class */
+    .hidden {
+      display: none;
+    }
+
+    /* Success Message */
+    #donateMsg {
+      text-align: center;
+      color: #00a651;
+      font-weight: bold;
+      margin-top: 15px;
+      padding: 15px;
+      background: #e8f8f0;
+      border-radius: 10px;
+      border-left: 4px solid #00a651;
+      animation: slideInRight 0.5s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 25px;
+        margin: 20px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      nav {
+        gap: 10px;
+      }
+
+      nav button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+
+      .blood-buttons {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .blood-buttons button {
+        padding: 15px;
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Loading Animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Hover Effects for Table Rows */
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover td {
+      color: #b30000;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Blood Bank & Availability Checker</h1>
+    <p>Donate Blood • Search Blood • Save Lives</p>
+  </header>
+
+  <nav>
+    <button onclick="showSection('check')"> Check Availability</button>
+    <button onclick="showSection('donate')"> Donate Blood</button>
+    <button onclick="showSection('all')"> View All Stock</button>
+    <button onclick="showSection('donors')"> Blood Donors</button>
+  </nav>
+
+  <div class="container">
+    <div class="quotes" id="quoteBox">
+      "Your blood can save someone’s life — be the reason for someone’s heartbeat today."
+    </div>
+
+   
+    <div id="check">
+      <h2>Select Your Blood Group</h2>
+      <div class="blood-buttons">
+        <button class="blood-btn" data-blood="A+">A+</button>
+        <button class="blood-btn" data-blood="A-">A-</button>
+        <button class="blood-btn" data-blood="B+">B+</button>
+        <button class="blood-btn" data-blood="B-">B-</button>
+        <button class="blood-btn" data-blood="AB+">AB+</button>
+        <button class="blood-btn" data-blood="AB-">AB-</button>
+        <button class="blood-btn" data-blood="O+">O+</button>
+        <button class="blood-btn" data-blood="O-">O-</button>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <!-- Section 2: Donate Blood -->
+    <div id="donate" class="hidden">
+      <h2>Donate Blood</h2>
+      <form id="donateForm">
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="text" id="hospital" placeholder="Hospital / Organization" required>
+        <input type="text" id="location" placeholder="Location (City)" required>
+        <select id="bloodType" required>
+          <option value="">Select Blood Group</option>
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+        <input type="number" id="units" placeholder="Units Available" required>
+        <input type="text" id="contact" placeholder="Contact Number" required>
+        <button type="submit">Submit Donation</button>
+      </form>
+      <p id="donateMsg" style="text-align:center;color:green;font-weight:bold;margin-top:10px;"></p>
+    </div>
+
+    <!-- Section 3: All Stock -->
+    <div id="all" class="hidden">
+      <h2>All Blood Stock</h2>
+      <div id="allStock"></div>
+    </div>
+
+    <!-- Section 4: Blood Donors -->
+    <div id="donors" class="hidden">
+      <h2>Blood Donors List</h2>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <p style="font-size: 1.2rem; font-weight: 600; color: #b30000;">
+          Total Donors: <span id="donorCount" style="font-size: 1.5rem;">0</span>
+        </p>
+      </div>
+      <div id="donorsList"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>💉 Donate Blood, Save Lives</p>
+    <p>"Every drop counts — together we make a difference."</p>
+  </footer>
+
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // ========================================
+    // 🔥 SUPABASE CONFIGURATION - CHANGE HERE! 🔥
+    // ========================================
+    
+    // ⚠️ IMPORTANT: Replace these with YOUR actual Supabase credentials
+    // Get them from: https://supabase.com → Your Project → Settings → API
+    
+    const SUPABASE_URL = 'https://lqlnyelzdjmhpcywcqch.supabase.co';        // Example: 'https://xxxxxxxxxxxxx.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxbG55ZWx6ZGptaHBjeXdjcWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NjExMjEsImV4cCI6MjA3NzMzNzEyMX0.ZGUHcTkmt9Y2Wtj44lvzAJM5PKZZ_n-v9hkjoqP_ou8';  // Your anon/public key (starts with 'eyJ...')
+
+    // ========================================
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('🔥 Supabase client initialized');
+    console.log('📍 URL:', SUPABASE_URL);
+    console.log('🔑 Key:', SUPABASE_ANON_KEY.substring(0, 20) + '...');
+
+    // === BLOOD STOCK DATA ===
+    let bloodStock = [];
+
+    const compatibility = {
+      "A+": ["A+", "A-", "O+", "O-"],
+      "A-": ["A-", "O-"],
+      "B+": ["B+", "B-", "O+", "O-"],
+      "B-": ["B-", "O-"],
+      "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      "AB-": ["A-", "B-", "AB-", "O-"],
+      "O+": ["O+", "O-"],
+      "O-": ["O-"]
+    };
+
+    const quotes = [
+      "Your blood can save someone’s life — be the reason for someone’s heartbeat today.",
+      "A few minutes for you, a lifetime for someone else.",
+      "Be a hero — donate blood and keep the world beating.",
+      "Every drop of blood is a drop of hope.",
+      "One pint of blood can save up to three lives."
+    ];
+
+    // ========================================
+    // INITIALIZE APP ON PAGE LOAD
+    // ========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 App initializing...');
+      loadBloodStock();
+      setupBloodButtons();
+      setupDonationForm();
+    });
+
+    // Setup blood type buttons
+    function setupBloodButtons() {
+      document.querySelectorAll('.blood-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bloodType = btn.getAttribute('data-blood');
+          console.log('Blood button clicked:', bloodType);
+          checkAvailability(bloodType);
+        });
+      });
+      console.log('✅ Blood buttons initialized');
+    }
+
+    // Setup donation form
+    function setupDonationForm() {
+      const form = document.getElementById("donateForm");
+      if (form) {
+        form.addEventListener("submit", handleDonationSubmit);
+        console.log('✅ Donation form initialized');
+      }
+    }
+
+    // ========================================
+    // SUPABASE DATABASE FUNCTIONS
+    // ========================================
+
+    // Load blood stock from Supabase database
+    async function loadBloodStock() {
+      console.log('📡 Loading blood stock from Supabase...');
+      try {
+        const { data, error } = await supabase
+          .from('blood_donations')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('❌ Supabase error:', error);
+          throw error;
+        }
+
+        bloodStock = data || [];
+        console.log('✅ Blood stock loaded from Supabase:', bloodStock.length, 'entries');
+        console.table(bloodStock);
+      } catch (error) {
+        console.error('❌ Error loading from Supabase:', error.message);
+        console.warn('⚠️ Using sample data as fallback');
+        // Use sample data if database connection fails
+        bloodStock = [
+          { id: 1, name: "John Doe", hospital: "Apollo Hospital", location: "Hyderabad", blood: "A+", units: 12, contact: "040-5551234", created_at: new Date() },
+          { id: 2, name: "Jane Smith", hospital: "Yashoda Hospital", location: "Secunderabad", blood: "O+", units: 20, contact: "040-6664321", created_at: new Date() },
+          { id: 3, name: "Mike Johnson", hospital: "KIMS Hospital", location: "Vijayawada", blood: "B+", units: 15, contact: "0866-2345678", created_at: new Date() },
+          { id: 4, name: "Sarah Williams", hospital: "CMC Hospital", location: "Guntur", blood: "A-", units: 8, contact: "0863-3344556", created_at: new Date() },
+          { id: 5, name: "David Brown", hospital: "NIMS Hospital", location: "Hyderabad", blood: "AB+", units: 5, contact: "040-7788990", created_at: new Date() },
+          { id: 6, name: "Emily Davis", hospital: "Rainbow Hospital", location: "Tirupati", blood: "O-", units: 3, contact: "0877-5566778", created_at: new Date() },
+          { id: 7, name: "Robert Miller", hospital: "SVIMS Hospital", location: "Tirupati", blood: "B-", units: 6, contact: "0877-3322110", created_at: new Date() },
+          { id: 8, name: "Lisa Wilson", hospital: "Care Hospital", location: "Guntur", blood: "AB-", units: 2, contact: "0863-9988776", created_at: new Date() }
+        ];
+        console.log('📊 Sample data loaded:', bloodStock.length, 'entries');
+      }
+    }
+
+    // Save donation to Supabase database
+    async function saveDonation(donationData) {
+      try {
+        const { data, error} = await supabase
+          .from('blood_donations')
+          .insert([{
+            name: donationData.name,
+            hospital: donationData.hospital,
+            location: donationData.location,
+            blood: donationData.blood,
+            units: donationData.units,
+            contact: donationData.contact
+          }])
+          .select();
+
+        if (error) throw error;
+
+        console.log('✅ Donation saved to Supabase successfully');
+        return { success: true, data: data[0] };
+      } catch (error) {
+        console.error('❌ Error saving to Supabase:', error.message);
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Get total donor count from Supabase
+    async function getDonorCount() {
+      try {
+        const { count, error } = await supabase
+          .from('blood_donations')
+          .select('*', { count: 'exact', head: true });
+
+        if (error) throw error;
+
+        return count || 0;
+      } catch (error) {
+        console.error('❌ Error getting donor count:', error.message);
+        return bloodStock.length;
+      }
+    }
+
+    // === QUOTE ROTATION ===
+    let quoteIndex = 0;
+    setInterval(() => {
+      quoteIndex = (quoteIndex + 1) % quotes.length;
+      document.getElementById("quoteBox").innerText = quotes[quoteIndex];
+    }, 4000);
+
+    // === SECTION TOGGLER ===
+    async function showSection(sectionId) {
+      document.querySelectorAll('.container > div').forEach(div => {
+        if (!div.classList.contains('quotes')) {
+          div.classList.add('hidden');
+        }
+      });
+      document.getElementById(sectionId).classList.remove('hidden');
+      document.getElementById("donateMsg").innerText = "";
+      document.getElementById("donateMsg").style.display = "none";
+      
+      if (sectionId === "all") {
+        await loadBloodStock();
+        displayAllStock();
+      } else if (sectionId === "donors") {
+        await loadBloodStock();
+        displayDonorsList();
+      }
+    }
+
+   
+    function checkAvailability(selected) {
+      console.log('🔍 Checking availability for blood type:', selected);
+      const resultDiv = document.getElementById("result");
+      const compatibleGroups = compatibility[selected];
+      const filtered = bloodStock.filter(item => compatibleGroups.includes(item.blood));
+
+      console.log('🩸 Compatible groups:', compatibleGroups);
+      console.log('📋 Filtered results:', filtered.length, 'items');
+
+      if (filtered.length === 0) {
+        resultDiv.innerHTML = `<p class="no-data">No stock available for ${selected} or compatible groups.</p>`;
+      } else {
+        let table = `
+          <div class="compatible">
+            Compatible Blood Groups for ${selected}: ${compatibleGroups.join(", ")}
+          </div>
+          <table>
+            <tr><th>Hospital</th><th>Location</th><th>Blood Group</th><th>Units</th><th>Contact</th></tr>`;
+        filtered.forEach(item => {
+          table += `<tr>
+                      <td>${item.hospital}</td>
+                      <td>${item.location}</td>
+                      <td><strong>${item.blood}</strong></td>
+                      <td>${item.units}</td>
+                      <td>${item.contact}</td>
+                    </tr>`;
+        });
+        table += "</table>";
+        resultDiv.innerHTML = table;
+      }
+    }
+
+    // === DONATION FORM HANDLER ===
+    async function handleDonationSubmit(e) {
+      e.preventDefault();
+      console.log('📝 Form submitted');
+      
+      const submitButton = e.target.querySelector('button[type="submit"]');
+      const originalText = submitButton.textContent;
+      submitButton.textContent = "Submitting...";
+      submitButton.disabled = true;
+
+      const donationData = {
+        name: document.getElementById("name").value.trim(),
+        hospital: document.getElementById("hospital").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        blood: document.getElementById("bloodType").value,
+        units: parseInt(document.getElementById("units").value),
+        contact: document.getElementById("contact").value.trim()
+      };
+
+      const result = await saveDonation(donationData);
+      const msgDiv = document.getElementById("donateMsg");
+
+      if (result.success) {
+        bloodStock.unshift(result.data);
+        msgDiv.innerHTML = "✅ Thank you! Your donation details have been saved to the database.";
+        msgDiv.style.color = "#00a651";
+        msgDiv.style.background = "#e8f8f0";
+        msgDiv.style.borderLeft = "4px solid #00a651";
+        msgDiv.style.padding = "15px";
+        msgDiv.style.borderRadius = "10px";
+        msgDiv.style.display = "block";
+        e.target.reset();
+        
+        setTimeout(() => {
+          msgDiv.style.display = "none";
+        }, 5000);
+      } else {
+        msgDiv.innerHTML = `❌ Error: ${result.error}<br><small>Please check your Supabase configuration</small>`;
+        msgDiv.style.color = "#d32f2f";
+        msgDiv.style.background = "#ffe8e8";
+        msgDiv.style.borderLeft = "4px solid #d32f2f";
+        msgDiv.style.padding = "15px";
+        msgDiv.style.borderRadius = "10px";
+        msgDiv.style.display = "block";
+      }
+
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+    }
+
+    // === DISPLAY ALL STOCK ===
+    function displayAllStock() {
+      const allDiv = document.getElementById("allStock");
+      if (bloodStock.length === 0) {
+        allDiv.innerHTML = "<p class='no-data'>No stock data available.</p>";
+        return;
+      }
+      let table = `
+        <table>
+          <tr><th>Hospital</th><th>Location</th><th>Blood Group</th><th>Units</th><th>Contact</th></tr>`;
+      bloodStock.forEach(item => {
+        table += `<tr>
+                    <td>${item.hospital}</td>
+                    <td>${item.location}</td>
+                    <td>${item.blood}</td>
+                    <td>${item.units}</td>
+                    <td>${item.contact}</td>
+                  </tr>`;
+      });
+      table += "</table>";
+      allDiv.innerHTML = table;
+    }
+
+    // === DISPLAY DONORS LIST ===
+    async function displayDonorsList() {
+      const donorsDiv = document.getElementById("donorsList");
+      const donorCountSpan = document.getElementById("donorCount");
+      
+      const count = await getDonorCount();
+      donorCountSpan.textContent = count;
+
+      if (bloodStock.length === 0) {
+        donorsDiv.innerHTML = "<p class='no-data'>No donors registered yet.</p>";
+        return;
+      }
+
+      let table = `
+        <table>
+          <tr>
+            <th>#</th>
+            <th>Donor Name</th>
+            <th>Blood Group</th>
+            <th>Hospital</th>
+            <th>Location</th>
+            <th>Units</th>
+            <th>Contact</th>
+            <th>Date</th>
+          </tr>`;
+      
+      bloodStock.forEach((item, index) => {
+        const date = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }) : 'N/A';
+        table += `<tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${item.name || 'Anonymous'}</strong></td>
+                    <td><strong style="color: #b30000; font-size: 1.1rem;">${item.blood}</strong></td>
+                    <td>${item.hospital}</td>
+                    <td>${item.location}</td>
+                    <td>${item.units}</td>
+                    <td>${item.contact}</td>
+                    <td>${date}</td>
+                  </tr>`;
+      });
+      table += "</table>";
+      donorsDiv.innerHTML = table;
+    }
+
+    // Console messages for developers
+    console.log('%c🩸 Blood Bank System with Supabase Integration', 'color: #b30000; font-size: 16px; font-weight: bold;');
+    console.log('%c📝 To configure: Edit bloodBank.html and update SUPABASE_URL and SUPABASE_ANON_KEY', 'color: #666; font-size: 12px;');
+  </script>
+
+</body>
+</html>
