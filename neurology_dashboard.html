@@ -21,6 +21,45 @@
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(10, 110, 124, 0.4); border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .past-record-table th, .past-record-table td {
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -45,7 +84,7 @@
                     <h2 class="text-lg font-semibold text-gray-800">Today is:</h2>
                     <p id="current-date" class="text-3xl font-bold text-primary-blue mt-1"></p>
                     <p class="text-sm text-gray-500 mt-2">Specialty: <span id="sidebar-specialty"></span></p>
-                    <button class="w-full mt-4 py-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition">
+                    <button onclick="showManageAvailabilityModal()" class="w-full mt-4 py-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition">
                         Manage Availability
                     </button>
                 </div>
@@ -53,10 +92,11 @@
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 space-y-3">
                     <h2 class="text-lg font-semibold text-gray-800">Quick Tools</h2>
                     <input type="text" id="patient-search" placeholder="Search Patient Name..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-primary-blue focus:border-primary-blue">
-                    <button class="w-full py-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition">
+                    
+                    <button onclick="showManualAppointmentModal()" class="w-full py-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition">
                         + Manual Appointment
                     </button>
-                    <button class="w-full py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-lg transition">
+                    <button onclick="viewPastRecords()" class="w-full py-2 text-white bg-gray-500 hover:bg-gray-600 rounded-lg transition">
                         View Past Records
                     </button>
                 </div>
@@ -130,32 +170,104 @@
 
     <footer class="p-8"></footer>
 
+    <div id="manualAppointmentModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-xl font-semibold text-gray-800">Manually Book Patient</h3>
+                <button onclick="hideManualAppointmentModal()" class="text-2xl text-gray-500 hover:text-red-500">&times;</button>
+            </div>
+            <form id="manualAppointmentForm" class="space-y-4">
+                <div>
+                    <label for="manualPatientName" class="block text-sm font-medium text-gray-700">Patient Name</label>
+                    <input type="text" id="manualPatientName" required class="w-full p-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label for="manualTime" class="block text-sm font-medium text-gray-700">Time (Today)</label>
+                    <input type="time" id="manualTime" required class="w-full p-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label for="manualReason" class="block text-sm font-medium text-gray-700">Reason for Visit / Symptoms</label>
+                    <input type="text" id="manualReason" required class="w-full p-2 border border-gray-300 rounded-lg">
+                </div>
+                <button type="submit" class="w-full py-2 text-white bg-primary-blue hover:bg-primary-dark rounded-lg transition">
+                    Book Appointment
+                </button>
+                <p id="manualApptMessage" class="text-sm text-red-500 text-center" style="display:none;"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="manageAvailabilityModal" class="modal-overlay">
+        <div class="modal-content max-w-lg">
+            <div class="modal-header">
+                <h3 class="text-xl font-semibold text-gray-800">Manage Availability for <span id="modal-doctor-specialty"></span></h3>
+                <button onclick="hideManageAvailabilityModal()" class="text-2xl text-gray-500 hover:text-red-500">&times;</button>
+            </div>
+            <form class="space-y-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Daily Hours</label>
+                    <div class="flex space-x-2">
+                        <input type="time" value="09:00" class="w-1/2 p-2 border border-gray-300 rounded-lg">
+                        <input type="time" value="17:00" class="w-1/2 p-2 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Days Off / Block Dates</label>
+                    <input type="date" class="w-full p-2 border border-gray-300 rounded-lg">
+                    <p class="text-xs text-gray-500">Select dates to mark as unavailable.</p>
+                </div>
+                <button type="button" onclick="alert('Availability Saved (Simulation)')" class="w-full py-2 text-white bg-primary-blue hover:bg-primary-dark rounded-lg transition">
+                    Save Availability
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="pastRecordsModal" class="modal-overlay">
+        <div class="modal-content max-w-2xl">
+            <div class="modal-header">
+                <h3 class="text-xl font-semibold text-primary-blue"><i class="fas fa-history mr-2"></i> Past Consultations for <span id="past-records-patient-name">Selected Patient</span></h3>
+                <button onclick="hidePastRecordsModal()" class="text-2xl text-gray-500 hover:text-red-500">&times;</button>
+            </div>
+            <div class="text-sm space-y-4">
+                <p class="font-medium text-gray-700">Records filtered by the patient name entered in the search bar. Includes past-due or completed appointments.</p>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-gray-800 mb-2">Patient Records Summary</h4>
+                    <p id="past-records-summary">Loading past appointments...</p>
+                </div>
+                
+                <h4 class="font-bold text-gray-800 border-b pb-1 mt-6">Consultation History</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full past-record-table">
+                        <thead>
+                            <tr class="bg-gray-200 text-xs text-gray-600 uppercase">
+                                <th>Date & Time</th>
+                                <th>Specialty</th>
+                                <th>Status</th>
+                                <th>Symptoms</th>
+                            </tr>
+                        </thead>
+                        <tbody id="past-records-body">
+                            </tbody>
+                    </table>
+                    <p id="no-past-records-msg" class="text-gray-500 text-center py-4 hidden">No past completed consultations found for this patient.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, query, onSnapshot, orderBy, doc, updateDoc, Timestamp, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, orderBy, doc, updateDoc, Timestamp, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // ========================================================================
-        // 🚨 STEP 1: CONFIGURATION - CHANGE THESE VALUES FOR EACH DOCTOR'S FILE 🚨
+        // 🚨 STEP 1: CONFIGURATION - NEUROLOGY DASHBOARD 🚨
         // ========================================================================
 
-        // EXAMPLE FOR CARDIO_DASHBOARD.HTML:
-       // const DOCTOR_NAME = "Dr. Priya Sharma";
-        //const DOCTOR_SPECIALTY = "Cardiology";
-        // This must match the specialty name used in the Patient Portal's form logic
-        // and the hardcoded doctor logic in index.html for consistent filtering/redirect.
-        //const FILTER_SPECIALTY = "Cardiology"; 
-
-
-        // EXAMPLE FOR DENTAL_DASHBOARD.HTML:
-        // const DOCTOR_NAME = "Dr. Sameer Khan";
-         //const DOCTOR_SPECIALTY = "Dentistry";
-         //const FILTER_SPECIALTY = "Dentistry";
-
-
-        // EXAMPLE FOR NEUROLOGY_DASHBOARD.HTML:
         const DOCTOR_NAME = "Dr. Alok Verma";
         const DOCTOR_SPECIALTY = "Neurology";
-         const FILTER_SPECIALTY = "Neurology";
+        const FILTER_SPECIALTY = "Neurology"; 
         
         // Firebase Configuration (Same as Patient Page)
         const firebaseConfig = {
@@ -173,9 +285,150 @@
 
 
         let db;
-        let currentAppointments = []; // Stores the raw data from Firestore
+        let currentAppointments = []; // Stores ALL appointments for this specialty
 
-        // --- UTILITY FUNCTIONS ---
+        // --- MODAL CONTROL FUNCTIONS ---
+
+        function showManualAppointmentModal() {
+            document.getElementById('manualAppointmentModal').style.display = 'flex';
+        }
+        function hideManualAppointmentModal() {
+            document.getElementById('manualAppointmentModal').style.display = 'none';
+        }
+
+        function showManageAvailabilityModal() {
+            document.getElementById('modal-doctor-specialty').textContent = DOCTOR_SPECIALTY;
+            document.getElementById('manageAvailabilityModal').style.display = 'flex';
+        }
+        function hideManageAvailabilityModal() {
+            document.getElementById('manageAvailabilityModal').style.display = 'none';
+        }
+        
+        // Past Records Modal Functions
+        function showPastRecordsModal() {
+            document.getElementById('pastRecordsModal').style.display = 'flex';
+        }
+        function hidePastRecordsModal() {
+            document.getElementById('pastRecordsModal').style.display = 'none';
+        }
+        window.hidePastRecordsModal = hidePastRecordsModal; // Expose globally
+
+        /** * CORE FIX: Fetches and renders past records based on the current
+         * value in the patient search bar. 
+         */
+        function viewPastRecords() {
+            const searchTerm = document.getElementById('patient-search').value.toLowerCase().trim();
+            
+            let targetPatientName = searchTerm || "No Patient Selected";
+            
+            // 1. Filter ALL loaded appointments for this specific patient
+            const patientRecords = currentAppointments.filter(appt => 
+                (appt.patientName || '').toLowerCase().includes(searchTerm)
+            );
+            
+            // 2. Filter records by past date OR completed status
+            const pastConsultations = patientRecords.filter(appt => {
+                const isCompleted = appt.status === 'Completed';
+                const isPastDate = appt.dateTime?.toDate ? (appt.dateTime.toDate().getTime() < Date.now()) : false;
+                
+                // A record is 'past' if it's explicitly completed OR if its scheduled time has passed.
+                return isCompleted || isPastDate;
+            }).sort((a, b) => b.sortableDate - a.sortableDate); // Sort newest to oldest
+            
+            // Set patient name in the modal header
+            if (patientRecords.length > 0) {
+                targetPatientName = patientRecords[0].patientName;
+            } else if (!searchTerm) {
+                 targetPatientName = "No Patient Selected";
+            }
+            
+            document.getElementById('past-records-patient-name').textContent = targetPatientName;
+            
+            // 3. Render the results
+            renderPastRecords(pastConsultations);
+            
+            // 4. Show the modal
+            showPastRecordsModal();
+        }
+        window.viewPastRecords = viewPastRecords; 
+
+        /** Renders the actual past appointment data into the modal table body */
+        function renderPastRecords(records) {
+            const tableBody = document.getElementById('past-records-body');
+            const summary = document.getElementById('past-records-summary');
+            const noRecordsMsg = document.getElementById('no-past-records-msg');
+            tableBody.innerHTML = '';
+
+            if (records.length === 0) {
+                summary.textContent = 'No past or completed consultations found for this patient.';
+                noRecordsMsg.classList.remove('hidden');
+                return;
+            }
+            
+            summary.textContent = `Found ${records.length} historical appointments for this patient in the database.`;
+            noRecordsMsg.classList.add('hidden');
+
+            records.forEach(record => {
+                const row = document.createElement('tr');
+                const formattedDateTime = formatFirebaseTimestamp(record.dateTime);
+
+                row.innerHTML = `
+                    <td class="whitespace-nowrap">${formattedDateTime.date} @ ${formattedDateTime.time}</td>
+                    <td>${record.doctor.includes('-') ? record.doctor.split('-')[1].trim() : record.doctor}</td>
+                    <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(record.status)}">${record.status}</span></td>
+                    <td>${record.symptoms || '—'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+
+        // --- NEW FEATURE: MANUAL APPOINTMENT SUBMISSION (SIMULATION + FIREBASE) ---
+        document.getElementById('manualAppointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const patientName = document.getElementById('manualPatientName').value.trim();
+            const time = document.getElementById('manualTime').value;
+            const reason = document.getElementById('manualReason').value.trim();
+            const date = new Date().toISOString().substring(0, 10); // Use today's date
+
+            if (!patientName || !time || !reason) return;
+
+            const msgElement = document.getElementById('manualApptMessage');
+            msgElement.style.display = 'block';
+            msgElement.textContent = 'Booking...';
+
+            try {
+                const appointmentDateTime = new Date(`${date}T${time}:00`);
+
+                const newAppointment = {
+                    patientName: patientName,
+                    doctor: `${DOCTOR_NAME} - ${DOCTOR_SPECIALTY}`, // Match patient form style
+                    date: date,
+                    time: time,
+                    symptoms: reason,
+                    dateTime: Timestamp.fromDate(appointmentDateTime),
+                    bookedAt: Timestamp.now(),
+                    bookedBy: 'Doctor Manual Entry',
+                    status: 'Checked In'
+                };
+                
+                await addDoc(collection(db, 'appointments'), newAppointment);
+
+                msgElement.textContent = `Manual appointment for ${patientName} booked successfully!`;
+                setTimeout(() => {
+                    hideManualAppointmentModal();
+                    document.getElementById('manualAppointmentForm').reset();
+                }, 1500);
+
+            } catch (error) {
+                console.error("Manual Booking Error:", error);
+                msgElement.textContent = `Booking failed: ${error.message}`;
+            }
+        });
+
+
+        // --- CORE UTILITY FUNCTIONS ---
 
         /** Returns the Tailwind classes for a given status */
         function getStatusClasses(status) {
@@ -194,7 +447,6 @@
         function updateStats(filteredList) {
             const today = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' });
             
-            // Only count appointments scheduled for today
             const todayAppointments = filteredList.filter(appt => {
                 const apptDate = appt.dateTime?.toDate ? new Date(appt.dateTime.toDate()).toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' }) : appt.date;
                 return apptDate === today;
@@ -214,28 +466,33 @@
             if (!timestamp || typeof timestamp.toDate !== 'function') return { time: 'N/A', date: 'N/A' };
             const date = timestamp.toDate();
             const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            const dateStr = date.toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
             return { time: timeStr, date: dateStr };
         }
         
-        /** Renders the list of appointments to the table */
+        /** Renders the list of appointments to the table (ONLY UPCOMING/TODAY) */
         function renderSchedule(data) {
             const listElement = document.getElementById('appointment-list');
-            listElement.innerHTML = ''; // Clear existing entries
+            listElement.innerHTML = ''; 
 
-            if (data.length === 0) {
+            // Filter for ONLY upcoming appointments for the main schedule table
+            const upcomingAppointments = data.filter(appt => 
+                appt.dateTime?.toDate ? (appt.dateTime.toDate().getTime() >= Date.now() - (60 * 60 * 1000)) : true
+            ).sort((a, b) => a.sortableDate - b.sortableDate);
+
+            if (upcomingAppointments.length === 0) {
                 listElement.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">No upcoming appointments for ${FILTER_SPECIALTY}.</td></tr>`;
                 updateStats([]);
                 return;
             }
 
-            data.forEach(appt => {
+            upcomingAppointments.forEach(appt => {
                 const statusClasses = getStatusClasses(appt.status);
                 const isActionable = appt.status !== 'Completed' && appt.status !== 'Cancelled' && appt.status !== 'Blocked';
                 
                 const formattedTime = appt.formattedTime || appt.time || 'N/A';
                 const patientName = appt.patientName || 'Unknown Patient';
-                const reasonOrDoctor = appt.doctor || 'Not specified'; // Using doctor field as visit reason from patient form
+                const reasonOrDoctor = appt.doctor || 'Not specified'; 
                 const symptoms = appt.symptoms || '—';
 
                 const row = document.createElement('tr');
@@ -260,10 +517,9 @@
                 `;
                 listElement.appendChild(row);
             });
-            updateStats(data);
+            updateStats(upcomingAppointments);
         }
 
-        // Must be attached to window to be callable from HTML button's onclick
         window.updateStatus = async function(id, newStatus) {
             if (!db) return;
             try {
@@ -271,8 +527,6 @@
                 await updateDoc(apptRef, {
                     status: newStatus
                 });
-                console.log(`Appointment ${id} updated to: ${newStatus}`);
-                // Realtime listener will automatically re-render the schedule
             } catch (error) {
                 console.error("Error updating document: ", error);
                 alert(`Failed to update status: ${error.message}`);
@@ -280,27 +534,23 @@
         }
 
 
-        /** Combines filtering and sorting before rendering */
         function applyFiltersAndSort() {
             const statusFilter = document.getElementById('status-filter').value;
             const sortType = document.getElementById('type-sort').value;
             const searchTerm = document.getElementById('patient-search').value.toLowerCase();
 
-            let filtered = currentAppointments.slice(); // Use the global copy of data
+            let filtered = currentAppointments.slice(); 
 
-            // 1. Filtering by Status
             if (statusFilter !== 'All') {
                 filtered = filtered.filter(appt => appt.status === statusFilter);
             }
 
-            // 2. Search by Patient Name
             if (searchTerm) {
                 filtered = filtered.filter(appt => 
                     (appt.patientName || '').toLowerCase().includes(searchTerm)
                 );
             }
 
-            // 3. Sorting (based on the original Timestamp)
             if (sortType === 'time-asc') {
                 filtered.sort((a, b) => a.sortableDate - b.sortableDate);
             } else if (sortType === 'name-asc') {
@@ -310,46 +560,30 @@
             renderSchedule(filtered);
         }
 
-        /** Sets up the real-time connection to Firebase Firestore */
+        /** * Fetches ALL appointments for this specialty from the database. */
         function setupRealtimeListener() {
             if (!db) {
                 console.error("Firestore not initialized.");
                 return;
             }
-
-            // IMPORTANT: Filter appointments where the 'doctor' field contains the specialty string.
-            // This is based on how the Patient Booking page saves the 'doctor' field.
-            const today = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-            
-            // To properly filter by specialty and sort by time, we fetch all relevant appointments 
-            // and filter by today's date in memory, as Firestore doesn't easily allow a 'contains' 
-            // filter on a string field *and* a sort on a different field in a complex way.
-            // We use the `where` query to filter by the `specialty` field (which should be added to the patient form).
-            // Since the patient form only saves 'doctor', we assume 'doctor' contains 'specialty'.
-            // However, a simple string match on the doctor field is prone to errors. 
-            // For a robust solution, we fetch all relevant appointments and filter by time/date in memory.
-            
-            // For this simulation, we'll rely on the assumption that the `doctor` field 
-            // contains the `FILTER_SPECIALTY` string, or, more safely, just fetch all appointments
-            // and filter locally if the 'doctor' field contains the specialty (as the patient form saves the doctor name with specialty).
             
             const q = query(
                 collection(db, 'appointments'),
-                orderBy('dateTime', 'asc') // Sort by date/time for display order
+                orderBy('dateTime', 'asc') 
             );
             
             onSnapshot(q, (snapshot) => {
                 const allAppointments = [];
+                const filterSpecialtyLower = FILTER_SPECIALTY.toLowerCase();
                 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    // Robust check for date field
+                    
                     const apptDate = data.dateTime?.toDate ? new Date(data.dateTime.toDate()) : (data.date ? new Date(data.date) : null);
                     
-                    if (apptDate && apptDate.getTime() >= Date.now() - (24 * 60 * 60 * 1000)) { // Show upcoming and today's appointments (last 24h)
+                    if (apptDate) { // Load ALL records 
                         
-                        // Local Filter based on specialty contained in the 'doctor' field
-                        if (data.doctor && data.doctor.toLowerCase().includes(FILTER_SPECIALTY.toLowerCase())) {
+                        if (data.doctor && data.doctor.toLowerCase().includes(filterSpecialtyLower)) {
                             const formatted = formatFirebaseTimestamp(data.dateTime);
                             const sortableDate = apptDate.getTime();
 
@@ -364,7 +598,7 @@
                 });
                 
                 currentAppointments = allAppointments;
-                applyFiltersAndSort(); // Re-apply current filters and render the new data
+                applyFiltersAndSort(); // Triggers the render 
             }, (error) => {
                 console.error("Error listening to appointments: ", error);
                 document.getElementById('appointment-list').innerHTML = '<tr><td colspan="6" class="p-6 text-center text-red-500">Failed to load schedule from database.</td></tr>';
@@ -373,7 +607,7 @@
 
         // --- INITIALIZATION ---
         function initializeAppAndAuth() {
-            // Set up UI text based on configuration
+            // Set up static UI text based on configuration
             document.getElementById('page-title').textContent = `${DOCTOR_SPECIALTY} Dashboard`;
             document.getElementById('header-specialty').textContent = `${DOCTOR_SPECIALTY}`;
             document.getElementById('sidebar-specialty').textContent = `${DOCTOR_SPECIALTY}`;
@@ -399,6 +633,12 @@
         }
         
         document.addEventListener('DOMContentLoaded', initializeAppAndAuth);
+        
+        // Expose modal control functions globally for button onclick attributes
+        window.showManualAppointmentModal = showManualAppointmentModal;
+        window.hideManualAppointmentModal = hideManualAppointmentModal;
+        window.showManageAvailabilityModal = showManageAvailabilityModal;
+        window.hideManageAvailabilityModal = hideManageAvailabilityModal;
     </script>
 </body>
 </html>
