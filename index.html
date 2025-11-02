@@ -55,6 +55,12 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        /* Mobile adjustment for navbar content */
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
         .logo {
             display: flex;
             align-items: center;
@@ -62,6 +68,8 @@
             font-weight: 700;
             color: var(--primary);
             height: 50px;
+            /* Ensure logo stays on the left on mobile */
+            flex-shrink: 0; 
         }
         .logo img {
             height: 100%;
@@ -154,9 +162,10 @@
         .user-pill:hover { background: var(--primary-dark); }
         .user-pill .fa-circle-user { font-size: 1.2em; color: #fff; }
         .user-dropdown {
-            display: none; position: absolute; top: 100%; right: 0;
+            position: absolute; top: 100%; right: 0;
             background: var(--card-bg); border-radius: 8px; box-shadow: var(--shadow-medium);
             margin-top: 10px; width: 180px; z-index: 100; overflow: hidden;
+            display: none; /* Initially hidden */
         }
         .user-dropdown a {
             display: block; padding: 12px 16px; color: var(--primary); text-decoration: none;
@@ -404,12 +413,69 @@
         .time-slot { padding: 10px 15px; background: #eaf3f5; border-radius: 20px; cursor: pointer; transition: var(--transition); }
         .time-slot:hover, .time-slot.selected { background: var(--primary); color: #fff; }
 
-        /* Responsive */
+        /* ======================================= */
+        /* === RESPONSIVE OVERRIDES (ADJUSTED) === */
+        /* ======================================= */
+
+        @media (max-width: 1024px) {
+            /* Adjust padding to stack header items on smaller desktops/tablets */
+            .navbar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .navbar-content {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+            .search-pill {
+                max-width: 100%;
+                order: 3; /* Push search below logo/login on medium screens */
+            }
+            .location-wrapper {
+                min-width: 150px;
+            }
+        }
+        
         @media (max-width: 768px) {
-            body { padding-top: 180px; }
-            .navbar { flex-direction: column; gap: 20px; padding: 20px 4vw; }
-            .bottom-navbar ul { gap: 20px; flex-wrap: wrap; }
-            .location-wrapper, .search-pill, .login-pill, .user-pill { width: 100%; max-width: 300px; justify-content: center; }
+            body { 
+                padding-top: 200px; /* Give more space for the stacked header on small devices */
+            } 
+            .navbar { 
+                flex-direction: column; 
+                gap: 20px; 
+                padding: 20px 4vw; 
+                align-items: flex-start; /* Align header items to the left */
+            }
+            .navbar-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            /* Stack these items in a column, taking full width */
+            .location-wrapper, 
+            .search-pill, 
+            .login-pill, 
+            .user-pill { 
+                width: 100%; 
+                max-width: 100%; 
+                justify-content: center; 
+            }
+            
+            /* Order elements on small screen */
+            .logo {
+                width: 100%;
+            }
+            .location-wrapper { order: 1; }
+            .search-pill { order: 2; }
+            .login-pill, .user-pill { order: 3; }
+            
+            /* Hide bottom navigation for very small devices */
+            .bottom-navbar {
+                display: none;
+            }
+            
             .hero h1 { font-size: 2.8rem; }
             .tips-grid { grid-template-columns: 1fr; padding: 0 20px 40px; }
             .newsletter { flex-direction: column; align-items: center; }
@@ -425,43 +491,45 @@
             <div class="logo">
                 <img src="https://static.vecteezy.com/system/resources/previews/046/305/217/original/hospital-logo-design-illustration-vector.jpg" alt="Hospital Logo" />
             </div>
-            <div class="location-wrapper">
-                <div class="location-pill" id="location">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <span id="locationText">Detecting...</span>
-                    <button id="locationToggleBtn" style="display:none;" title="Toggle between City and Coordinates">
-                        <i class="fas fa-arrows-left-right-to-line"></i>
-                    </button>
+            <div class="navbar-content">
+                <div class="location-wrapper">
+                    <div class="location-pill" id="location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span id="locationText">Detecting...</span>
+                        <button id="locationToggleBtn" style="display:none;" title="Toggle between City and Coordinates">
+                            <i class="fas fa-arrows-left-right-to-line"></i>
+                        </button>
+                    </div>
+                    <div class="dropdown" id="locationDropdown">
+                        <select id="citySelect">
+                            <option value="">Select Your City</option>
+                            <option value="Hyderabad">Hyderabad</option>
+                            <option value="Bangalore">Bangalore</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Kolkata">Kolkata</option>
+                            <option value="Pune">Pune</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="dropdown" id="locationDropdown">
-                    <select id="citySelect">
-                        <option value="">Select Your City</option>
-                        <option value="Hyderabad">Hyderabad</option>
-                        <option value="Bangalore">Bangalore</option>
-                        <option value="Chennai">Chennai</option>
-                        <option value="Mumbai">Mumbai</option>
-                        <option value="Delhi">Delhi</option>
-                        <option value="Kolkata">Kolkata</option>
-                        <option value="Pune">Pune</option>
-                    </select>
+                <div class="search-pill" style="position: relative;">
+                    <i class="fa fa-magnifying-glass"></i>
+                    <input type="search" id="searchInput" placeholder="Search Doctors, Specialities, Conditions, etc..." />
+                    <div class="search-results" id="searchResults"></div>
                 </div>
+                <button class="login-pill" id="loginButton">
+                    Login <i class="fa-regular fa-circle-user"></i>
+                </button>
+                <button class="user-pill" id="userPill">
+                    <span id="userEmailDisplay"></span> <i class="fa-regular fa-circle-user"></i>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#">Profile</a>
+                        <a href="appo.html" id="myAppointmentsLink">My Appointments</a>
+                        <a id="logoutLink">Logout</a>
+                    </div>
+                </button>
             </div>
-            <div class="search-pill" style="position: relative;">
-                <i class="fa fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="Search Doctors, Specialities, Conditions, etc..." />
-                <div class="search-results" id="searchResults"></div>
-            </div>
-            <button class="login-pill" id="loginButton">
-                Login&nbsp;<i class="fa-regular fa-circle-user"></i>
-            </button>
-            <button class="user-pill" id="userPill">
-                <span id="userEmailDisplay"></span>&nbsp;<i class="fa-regular fa-circle-user"></i>
-                <div class="user-dropdown" id="userDropdown">
-                    <a href="#">Profile</a>
-                    <a href="appo.html">My Appointments</a>
-                    <a id="logoutLink">Logout</a>
-                </div>
-            </button>
         </div>
         <div class="bottom-navbar">
             <ul>
@@ -577,7 +645,6 @@
         </div>
     </section>
 
-    <!-- New: Health Tips Section -->
     <section class="health-tips-section">
         <div class="health-tips-header">
             <h2>Daily Health Tips</h2>
@@ -626,12 +693,11 @@
         <div>© 2025 Your Hospital. All Rights Reserved.</div>
     </footer>
 
-    <!-- Existing Modals -->
     <div class="modal-overlay" id="loginModalOverlay">
         <div class="login-modal">
             <div class="modal-header">
-                <h2>Patient Login</h2>
-                <span class="close-btn login-close-btn">&times;</span>
+                <h2>Patient/Doctor Login</h2>
+                <span class="close-btn login-close-btn">×</span>
             </div>
             <form class="login-form" id="loginForm">
                 <div class="form-group">
@@ -655,7 +721,7 @@
         <div class="signup-modal">
             <div class="modal-header">
                 <h2>Register New Account</h2>
-                <span class="close-btn signup-close-btn">&times;</span>
+                <span class="close-btn signup-close-btn">×</span>
             </div>
             <form class="signup-form" id="signupForm">
                 <div class="form-group">
@@ -679,7 +745,7 @@
         <div class="medical-info-modal">
             <div class="modal-header">
                 <h2 id="medicalInfoTitle"></h2>
-                <span class="close-btn medical-info-close-btn">&times;</span>
+                <span class="close-btn medical-info-close-btn">×</span>
             </div>
             <div id="medicalInfoContent">
                 <div class="loading-spinner" id="medicalInfoLoading">
@@ -695,12 +761,11 @@
         </div>
     </div>
 
-    <!-- New: Appointment Modal -->
     <div class="modal-overlay" id="appointmentModalOverlay" style="display:none;">
         <div class="appointment-modal">
             <div class="modal-header">
                 <h2>Book Appointment</h2>
-                <span class="close-btn" onclick="hideAppointmentModal()">&times;</span>
+                <span class="close-btn" onclick="hideAppointmentModal()">×</span>
             </div>
             <form id="appointmentForm">
                 <div class="form-group">
@@ -722,12 +787,11 @@
         </div>
     </div>
 
-    <!-- New: Quick Consult Modal -->
     <div class="modal-overlay" id="quickConsultModalOverlay" style="display:none;">
         <div class="login-modal">
             <div class="modal-header">
                 <h2>Quick Consult</h2>
-                <span class="close-btn" onclick="hideQuickConsult()">&times;</span>
+                <span class="close-btn" onclick="hideQuickConsult()">×</span>
             </div>
             <form id="consultForm">
                 <div class="form-group">
@@ -742,7 +806,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script>
-        // Existing Firebase Config and Auth Logic (unchanged)
+        // Existing Firebase Config (unchanged)
         const firebaseConfig = {
             apiKey: "AIzaSyBIGxImEMAlJn_LvTD6XLs4DRAfeW6-784",
             authDomain: "user-autrhentication.firebaseapp.com",
@@ -751,7 +815,15 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const auth = firebase.auth();
 
-        // Hardcoded medical summaries to make the feature work without API key
+        // --- UPDATED DOCTOR CONFIGURATION (Four Doctors) ---
+        const DOCTOR_CREDENTIALS = [
+            { email: 'dr.cardio@hospital.com', password: 'cardiopass', name: 'Dr. Priya Sharma', dashboard: 'cardio_dashboard.html' },
+            { email: 'dr.dentist@hospital.com', password: 'dentalpass', name: 'Dr. Sameer Khan', dashboard: 'dental_dashboard.html' },
+            { email: 'dr.neuro@hospital.com', password: 'neuro_password', name: 'Dr. Alok Verma', dashboard: 'neurology_dashboard.html' },
+            { email: 'dr.general@hospital.com', password: 'generalpass', name: 'Dr. Kavya Rao (GP)', dashboard: 'general_dashboard.html' }
+        ];
+
+        // Hardcoded medical summaries (existing code)
         const medicalSummaries = {
             "Cardiology": "Cardiology is the branch of medicine that deals with diseases and conditions of the heart and blood vessels. Specialists handle common issues like heart attacks, arrhythmias, and hypertension through diagnostics, medications, and procedures such as stents or pacemakers. Regular check-ups can prevent many cardiovascular risks.",
             "Family Medicine": "Family Medicine provides comprehensive primary care for individuals and families across all ages, genders, and diseases. It covers preventive health, chronic disease management, and acute care, including vaccinations, routine exams, and treatment for common illnesses like flu or diabetes monitoring.",
@@ -761,12 +833,13 @@
             "Pulmonology": "Pulmonology deals with respiratory system diseases affecting the lungs and airways. It addresses asthma, COPD, pneumonia, and sleep apnea through inhalers, oxygen therapy, or pulmonary rehab. Smoking cessation is key for prevention."
         };
 
-        // Existing Element References and Functions (unchanged - clearLoginError, setLoginError, etc.)
+        // Existing Element References (unchanged)
         const loginButton = document.getElementById('loginButton');
         const userPill = document.getElementById('userPill');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         const userDropdown = document.getElementById('userDropdown');
         const logoutLink = document.getElementById('logoutLink');
+        const myAppointmentsLink = document.getElementById('myAppointmentsLink');
         const loginModalOverlay = document.getElementById('loginModalOverlay');
         const signupModalOverlay = document.getElementById('signupModalOverlay');
         const loginForm = document.getElementById('loginForm');
@@ -803,28 +876,65 @@
         const locationPill = document.getElementById('location');
         const locationToggleBtn = document.getElementById('locationToggleBtn');
 
-        // Existing Auth Functions (updateUIAfterAuth, showLoginModal, etc. - unchanged)
+        // Helper function to find the doctor by email
+        function getDoctorByEmail(email) {
+            return DOCTOR_CREDENTIALS.find(d => d.email === email);
+        }
+
+        // Existing Auth/Modal/Geo Functions
         function clearLoginError() { loginErrorMessage.textContent = ''; loginErrorMessage.style.display = 'none'; }
         function setLoginError(message) { loginErrorMessage.textContent = message; loginErrorMessage.style.display = 'block'; }
         function clearSignupError() { signupErrorMessage.textContent = ''; signupErrorMessage.style.display = 'none'; }
         function setSignupError(message) { signupErrorMessage.textContent = message; signupErrorMessage.style.display = 'block'; }
+        
         function updateUIAfterAuth(user) {
-            if (user) {
+            const loggedInDoctorEmail = localStorage.getItem('isDoctorLoggedIn');
+            const doctorProfile = loggedInDoctorEmail ? getDoctorByEmail(loggedInDoctorEmail) : null;
+
+            if (user || doctorProfile) {
                 loginButton.style.display = 'none';
                 userPill.style.display = 'flex';
-                const displayName = user.email ? user.email.split('@')[0] : 'User';
+                
+                let displayName;
+                let isDoctor = false;
+
+                if (doctorProfile) {
+                    displayName = doctorProfile.name;
+                    isDoctor = true;
+                } else if (user) {
+                    displayName = user.email ? user.email.split('@')[0] : 'User';
+                    const userIsDoctor = getDoctorByEmail(user.email);
+                    if (userIsDoctor) {
+                        displayName = userIsDoctor.name;
+                        isDoctor = true;
+                    }
+                }
+                
                 userEmailDisplay.textContent = displayName;
+
+                // Update 'My Appointments' link/text
+                if (isDoctor && doctorProfile) {
+                    myAppointmentsLink.href = doctorProfile.dashboard;
+                    myAppointmentsLink.textContent = 'My Dashboard';
+                } else {
+                    myAppointmentsLink.href = 'appo.html'; // Default patient page
+                    myAppointmentsLink.textContent = 'My Appointments';
+                }
+
             } else {
                 loginButton.style.display = 'flex';
                 userPill.style.display = 'none';
                 userDropdown.style.display = 'none';
+                localStorage.removeItem('isDoctorLoggedIn'); // Ensure local storage is cleared
+                myAppointmentsLink.href = 'appo.html';
+                myAppointmentsLink.textContent = 'My Appointments';
             }
         }
+        
         function toggleUserDropdown() { userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block'; }
         function showLoginModal(event) {
             if (event) event.preventDefault();
-            signupModalOverlay.style.display = 'none';
-            medicalInfoModalOverlay.style.display = 'none';
+            hideAllModals(); // Hide other modals just in case
             loginModalOverlay.style.display = 'flex';
             document.body.classList.add('modal-open');
             clearLoginError();
@@ -836,7 +946,26 @@
             loginForm.reset();
             clearLoginError();
         }
-        function hideAllModals() { hideLoginModal(); hideSignupModal(); hideMedicalInfoModal(); }
+        function hideAppointmentModal() {
+            appointmentModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        function hideQuickConsult() {
+            document.getElementById('quickConsultModalOverlay').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        function hideSignupModal() {
+            signupModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            signupForm.reset();
+            clearSignupError();
+        }
+        function hideMedicalInfoModal() {
+            medicalInfoModalOverlay.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        function hideAllModals() { hideLoginModal(); hideSignupModal(); hideMedicalInfoModal(); hideAppointmentModal(); hideQuickConsult(); }
+
         function showSignupModal(event) {
             if (event) event.preventDefault();
             loginModalOverlay.style.display = 'none';
@@ -846,12 +975,7 @@
             clearSignupError();
             loginForm.reset();
         }
-        function hideSignupModal() {
-            signupModalOverlay.style.display = 'none';
-            document.body.classList.remove('modal-open');
-            signupForm.reset();
-            clearSignupError();
-        }
+        
         function showMedicalInfoModal(title, specialty) {
             medicalInfoTitle.textContent = title;
             medicalInfoModalOverlay.style.display = 'flex';
@@ -869,26 +993,8 @@
                 medicalInfoResult.style.display = 'block';
             }, 1500); // Simulate loading delay
         }
-        function hideMedicalInfoModal() {
-            medicalInfoModalOverlay.style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }
-        // Updated fetchMedicalSummary to use hardcoded data (removed API call)
-        async function fetchMedicalSummary(specialty) {
-            // This is now handled directly in showMedicalInfoModal for simplicity
-            console.log(`Summary for ${specialty} loaded from local data.`);
-        }
-        function copySummary() {
-            const textToCopy = medicalInfoTitle.textContent + "\n\n" + medicalInfoText.textContent;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    const btn = document.querySelector('#medicalInfoResult .submit-btn');
-                    const originalText = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                    setTimeout(() => { btn.innerHTML = originalText; }, 1500);
-                }).catch(err => { fallbackCopyTextToClipboard(textToCopy); });
-            } else { fallbackCopyTextToClipboard(textToCopy); }
-        }
+        
+        // --- Remaining Existing Functions (copySummary, calculateDistance, fetchNearbyHospitals, etc.) ---
         function fallbackCopyTextToClipboard(text) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -903,7 +1009,20 @@
             } catch (err) { console.error('Fallback: Oops, unable to copy', err); }
             document.body.removeChild(textArea);
         }
-        // Existing calculateDistance, fetchNearbyHospitals, getCityFromNominatimResponse, toggleLocationDisplay, success, fail, showDropdown (unchanged)
+        function copySummary() {
+            const textToCopy = medicalInfoTitle.textContent + "\n\n" + medicalInfoText.textContent;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const btn = document.querySelector('#medicalInfoResult .submit-btn');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+                }).catch(err => { fallbackCopyTextToClipboard(textToCopy); });
+            } else { fallbackCopyTextToClipboard(textToCopy); }
+        }
+        async function fetchMedicalSummary(specialty) {
+            console.log(`Summary for ${specialty} loaded from local data.`);
+        }
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1013,23 +1132,37 @@
             isShowingCity = true;
         }
 
-        // Existing Event Listeners (auth.onAuthStateChanged, loginButton.addEventListener, etc. - unchanged)
+        // Existing Event Listeners
         auth.onAuthStateChanged((user) => { updateUIAfterAuth(user); });
         loginButton.addEventListener('click', showLoginModal);
         userPill.addEventListener('click', (e) => { e.stopPropagation(); toggleUserDropdown(); });
+        
+        // --- LOGOUT HANDLER (Updated to handle multiple doctors) ---
         logoutLink.addEventListener('click', (event) => {
             event.preventDefault();
-            auth.signOut().then(() => { updateUIAfterAuth(null); userDropdown.style.display = 'none'; }).catch((error) => { console.error("Logout Error:", error); });
+            const loggedInDoctorEmail = localStorage.getItem('isDoctorLoggedIn');
+
+            if (loggedInDoctorEmail) {
+                 localStorage.removeItem('isDoctorLoggedIn');
+                 updateUIAfterAuth(null); 
+                 userDropdown.style.display = 'none';
+                 // Redirect to home page
+                 window.location.href = 'index.html'; 
+            } else {
+                // Patient Firebase Logout
+                auth.signOut().then(() => { updateUIAfterAuth(null); userDropdown.style.display = 'none'; }).catch((error) => { console.error("Logout Error:", error); });
+            }
         });
+
         loginCloseBtn.addEventListener('click', hideLoginModal);
         signupCloseBtn.addEventListener('click', hideSignupModal);
         medicalInfoCloseBtn.addEventListener('click', hideMedicalInfoModal);
         showSignupLink.addEventListener('click', showSignupModal);
         showLoginLink.addEventListener('click', showLoginModal);
         document.addEventListener("click", (e) => {
-            if (e.target === loginModalOverlay) { hideLoginModal(); }
-            if (e.target === signupModalOverlay) { hideSignupModal(); }
-            if (e.target === medicalInfoModalOverlay) { hideMedicalInfoModal(); }
+            if (e.target === loginModalOverlay) { hideAllModals(); } // Use hideAllModals here
+            if (e.target === signupModalOverlay) { hideAllModals(); } // Use hideAllModals here
+            if (e.target === medicalInfoModalOverlay) { hideAllModals(); } // Use hideAllModals here
             if (!userPill.contains(e.target)) { userDropdown.style.display = 'none'; }
         });
         specialtiesGrid.addEventListener('click', (event) => {
@@ -1038,17 +1171,37 @@
                 const specialty = targetCard.getAttribute('data-specialty');
                 if (specialty) { 
                     showMedicalInfoModal(`What is ${specialty}?`, specialty); 
-                    fetchMedicalSummary(specialty); // Now just logs, summary loaded in modal
+                    fetchMedicalSummary(specialty);
                 }
             }
         });
+
+        // --- UPDATED LOGIN HANDLER (for Doctor and Patient) ---
         loginForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const email = usernameInput.value;
             const password = passwordInput.value;
             clearLoginError();
+
+            // 1. Check for Doctor Login (Hardcoded Array Search)
+            const doctorMatch = DOCTOR_CREDENTIALS.find(d => d.email === email && d.password === password);
+            
+            if (doctorMatch) {
+                hideAllModals();
+                // Store the doctor's email to maintain state after redirect/refresh
+                localStorage.setItem('isDoctorLoggedIn', doctorMatch.email); 
+                
+                // Redirect to the specific Doctor Dashboard page
+                window.location.href = doctorMatch.dashboard; 
+                return; 
+            }
+
+            // 2. Fallback to Patient (Firebase) Login
             auth.signInWithEmailAndPassword(email, password)
-                .then(() => { hideAllModals(); })
+                .then(() => { 
+                    hideAllModals(); 
+                    localStorage.removeItem('isDoctorLoggedIn'); // Ensure local doctor status is cleared if a patient logs in
+                })
                 .catch((error) => {
                     const errorCode = error.code;
                     if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password' || errorCode === 'auth/invalid-email') {
@@ -1059,6 +1212,8 @@
                     }
                 });
         });
+        // --- END UPDATED LOGIN HANDLER ---
+
         signupForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const email = signupEmailInput.value;
@@ -1154,10 +1309,8 @@
             appointmentDate.valueAsDate = new Date();
             generateTimeSlots();
         }
-        function hideAppointmentModal() {
-            appointmentModalOverlay.style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }
+        // function hideAppointmentModal is defined earlier in hideAllModals
+
         function generateTimeSlots() {
             const slots = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
             timeSlots.innerHTML = slots.map(slot => `<div class="time-slot" onclick="selectTimeSlot(this)">${slot}</div>`).join('');
@@ -1171,7 +1324,7 @@
             const selectedTime = document.querySelector('.time-slot.selected');
             if (selectedTime) {
                 alert('Appointment booked successfully!'); // Simulate booking
-                hideAppointmentModal();
+                hideAllModals();
             } else {
                 alert('Please select a time slot.');
             }
@@ -1179,18 +1332,17 @@
         appointmentDate.addEventListener('change', generateTimeSlots);
 
         // New: Quick Consult
+        const quickConsultModalOverlay = document.getElementById('quickConsultModalOverlay');
         function showQuickConsult() {
-            document.getElementById('quickConsultModalOverlay').style.display = 'flex';
+            quickConsultModalOverlay.style.display = 'flex';
             document.body.classList.add('modal-open');
         }
-        function hideQuickConsult() {
-            document.getElementById('quickConsultModalOverlay').style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }
+        // function hideQuickConsult is defined earlier in hideAllModals
+
         document.getElementById('consultForm').addEventListener('submit', (e) => {
             e.preventDefault();
             alert('Your query has been sent to our team. We\'ll respond soon!'); // Simulate
-            hideQuickConsult();
+            hideAllModals();
         });
 
         // New: Newsletter Signup
@@ -1205,10 +1357,14 @@
         }
 
         // Close modals on overlay click
-        appointmentModalOverlay.addEventListener('click', (e) => { if (e.target === appointmentModalOverlay) hideAppointmentModal(); });
-        document.getElementById('quickConsultModalOverlay').addEventListener('click', (e) => { if (e.target === document.getElementById('quickConsultModalOverlay')) hideQuickConsult(); });
+        appointmentModalOverlay.addEventListener('click', (e) => { if (e.target === appointmentModalOverlay) hideAllModals(); });
+        quickConsultModalOverlay.addEventListener('click', (e) => { if (e.target === quickConsultModalOverlay) hideAllModals(); });
+
+        // Initial check for doctor login status on page load (to maintain login state)
+        // If localStorage has a doctor email, call updateUIAfterAuth to render the doctor pill
+        if (localStorage.getItem('isDoctorLoggedIn')) {
+            updateUIAfterAuth(null); 
+        }
     </script>
 </body>
-
 </html>
-
