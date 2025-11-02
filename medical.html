@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medical Condition - Hospital Management</title>
+  <style>
+    /* Base Reset and Fonts */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e8f5f1, #cce7e2);
+      color: #054e5b;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.5s ease;
+    }
+
+    /* Full width header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw; /* full viewport width */
+      background: linear-gradient(135deg, #009688, #004d40);
+      padding: 18px 40px;
+      box-sizing: border-box;
+      box-shadow: 0 8px 20px rgba(0, 77, 64, 0.4);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      user-select: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      letter-spacing: 0.03em;
+      backdrop-filter: saturate(180%) blur(8px);
+    }
+   .co{
+    position: relative;
+    left:550px;
+   }
+
+    /* Push content down below fixed header */
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      margin-top: 90px; /* header height + some space */
+      padding: 0 15px;
+    }
+
+    /* Hide old h2 */
+    h2 {
+      display: none;
+    }
+
+    /* Card styles */
+    .card {
+      background: #ffffffdd;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 150, 130, 0.15);
+      padding: 30px 35px;
+      margin-bottom: 50px;
+      transition: box-shadow 0.3s ease, transform 0.25s ease;
+      backdrop-filter: saturate(180%) blur(8px);
+    }
+    .card:hover {
+      box-shadow: 0 15px 40px rgba(0, 150, 130, 0.3);
+      transform: translateY(-5px);
+    }
+
+    /* Form grid */
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px 30px;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      color: #04514f;
+      letter-spacing: 0.015em;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: 2px solid #009688;
+      font-size: 1.05rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: inherit;
+      color: #054e5b;
+      background-color: #f6fdfb;
+      resize: vertical;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #004d40;
+      box-shadow: 0 0 8px #00796baa;
+      background-color: #e0f2f1;
+    }
+
+    textarea {
+      min-height: 80px;
+      max-height: 140px;
+      line-height: 1.4;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Submit button */
+    .btn-submit {
+      grid-column: 1 / -1;
+      justify-self: end;
+      background: linear-gradient(135deg, #004d40, #009688);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 40px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0, 150, 130, 0.5);
+      transition: 
+        background 0.3s ease,
+        transform 0.2s ease,
+        box-shadow 0.3s ease;
+      user-select: none;
+      letter-spacing: 0.03em;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #00796b, #004d40);
+      transform: scale(1.1);
+      box-shadow: 0 15px 30px rgba(0, 150, 130, 0.75);
+    }
+    .btn-submit:active {
+      transform: scale(0.95);
+      box-shadow: 0 8px 22px rgba(0, 150, 130, 0.85);
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 150, 130, 0.15);
+      background: #fff;
+      font-size: 0.95rem;
+    }
+    thead {
+      background: linear-gradient(135deg, #009688, #004d40);
+      color: #e0f7f5;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+      color: #054e5b;
+      border-bottom: 1px solid #d7eae7;
+      vertical-align: middle;
+      letter-spacing: 0.01em;
+    }
+    tbody tr:hover {
+      background-color: #ccf0e8;
+      transition: background-color 0.3s ease;
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 720px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      .btn-submit {
+        justify-self: center;
+        width: 100%;
+      }
+      th, td {
+        font-size: 0.9rem;
+        padding: 12px 14px;
+      }
+      header {
+        font-size: 1.5rem;
+        padding: 16px 20px;
+      }
+      header span.emoji {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="co">Medical Condition</div>
+  </header>
+
+  <div class="container">
+
+    <!-- Form Section -->
+    <div class="card" aria-label="Add Medical Condition Form">
+      <form id="conditionForm" novalidate>
+        <div>
+          <label for="patientId">Patient ID</label>
+          <input type="number" id="patientId" name="patientId" placeholder="Enter Patient ID" required />
+        </div>
+        <div>
+          <label for="conditionName">Condition Name</label>
+          <input type="text" id="conditionName" name="conditionName" placeholder="e.g., Hypertension" required />
+        </div>
+        <div>
+          <label for="icdCode">ICD-10 Code</label>
+          <input type="text" id="icdCode" name="icdCode" placeholder="e.g., I10" />
+        </div>
+        <div>
+          <label for="severity">Severity</label>
+          <select id="severity" name="severity">
+            <option>Mild</option>
+            <option>Moderate</option>
+            <option>Severe</option>
+          </select>
+        </div>
+        <div>
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option>Active</option>
+            <option>Resolved</option>
+            <option>Chronic</option>
+          </select>
+        </div>
+        <div>
+          <label for="dateDiagnosed">Date Diagnosed</label>
+          <input type="date" id="dateDiagnosed" name="dateDiagnosed" required />
+        </div>
+        <div>
+          <label for="physician">Treating Physician</label>
+          <input type="text" id="physician" name="physician" placeholder="Dr. A. Sharma" />
+        </div>
+        <div class="full-width">
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Add remarks..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit" aria-label="Add Medical Condition">Add Condition</button>
+      </form>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card" aria-label="Existing Medical Conditions">
+      <h3 style="margin-bottom: 25px; color:#00796b; font-weight: 700; letter-spacing: 0.03em;">Existing Medical Conditions</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Patient ID</th>
+            <th>Condition</th>
+            <th>ICD-10</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Physician</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="conditionsTable">
+          <!-- Rows generated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const tableBody = document.getElementById('conditionsTable');
+    const form = document.getElementById('conditionForm');
+
+    // Mock Data
+    const conditions = [
+      { patientId: 101, conditionName: 'Hypertension', icdCode: 'I10', severity: 'Moderate', status: 'Chronic', dateDiagnosed: '2022-05-01', physician: 'Dr. A. Sharma', notes: 'Under medication' },
+      { patientId: 102, conditionName: 'Type 2 Diabetes', icdCode: 'E11', severity: 'Moderate', status: 'Chronic', dateDiagnosed: '2021-03-15', physician: 'Dr. B. Mehta', notes: 'Regular check-ups required' },
+      { patientId: 103, conditionName: 'Pneumonia', icdCode: 'J18', severity: 'Severe', status: 'Resolved', dateDiagnosed: '2023-08-02', physician: 'Dr. R. Singh', notes: 'Recovered after antibiotics' }
+    ];
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      conditions.forEach((c, index) => {
+        tableBody.innerHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${c.patientId}</td>
+            <td>${c.conditionName}</td>
+            <td>${c.icdCode}</td>
+            <td>${c.severity}</td>
+            <td>${c.status}</td>
+            <td>${c.dateDiagnosed}</td>
+            <td>${c.physician}</td>
+            <td>${c.notes}</td>
+          </tr>
+        `;
+      });
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const newCondition = {
+        patientId: Number(form.patientId.value),
+        conditionName: form.conditionName.value.trim(),
+        icdCode: form.icdCode.value.trim(),
+        severity: form.severity.value,
+        status: form.status.value,
+        dateDiagnosed: form.dateDiagnosed.value,
+        physician: form.physician.value.trim(),
+        notes: form.notes.value.trim()
+      };
+      conditions.push(newCondition);
+      renderTable();
+      form.reset();
+    });
+
+    // Initial render
+    renderTable();
+  </script>
+
+</body>
+</html>
