@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Finder - Health Packages</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #f6f9fc;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #02475b, #02b0a0);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 20px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #02475b;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #02475b, #02b0a0);
+      border-radius: 2px;
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 25px;
+    }
+
+    .package-card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border-top: 5px solid #02b0a0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .package-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .package-card::before {
+      content: "";
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -100%;
+      left: -100%;
+      background: radial-gradient(circle at top right, rgba(2, 176, 160, 0.15), transparent 70%);
+      z-index: 0;
+    }
+
+    .package-title {
+      font-size: 1.3rem;
+      color: #02475b;
+      font-weight: 600;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .package-card p {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .price-tag {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #02b0a0;
+      margin-top: 10px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #02475b, #02b0a0);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      z-index: 2;
+      position: relative;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #026b73, #02b0a0);
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      position: relative;
+      animation: popIn 0.3s ease-in-out;
+    }
+
+    .close {
+      position: absolute;
+      top: 12px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .form-group input:focus {
+      border-color: #02b0a0;
+      outline: none;
+      box-shadow: 0 0 5px rgba(2, 176, 160, 0.3);
+    }
+
+    .toast {
+      display: none;
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      background: #02b37d;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+    }
+
+    footer {
+      background: #02475b;
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.95rem;
+      margin-top: 3rem;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>🏥 Hospital Finder - Health Packages</header>
+
+  <section class="container">
+    <h2 class="section-title">Explore Our Comprehensive Health Packages</h2>
+    <div class="package-grid" id="packageGrid"></div>
+  </section>
+
+  <!-- Booking Modal -->
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="bookingClose">&times;</span>
+      <h3>Book Your Health Package</h3>
+      <form id="bookingForm">
+        <input type="hidden" name="package" id="bookingPackageName" />
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="form-group">
+          <label>Contact Number</label>
+          <input type="tel" name="contact" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" required />
+        </div>
+        <button type="submit" class="btn">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toastMsg">Booking Successful!</div>
+
+  <footer>&copy; 2025 Hospital Finder | Designed for Better Health 💙</footer>
+
+  <!-- ✅ EmailJS Integration -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("ZT0cQdonkkJcGA3L0"); // Your EmailJS Public Key
+    })();
+
+    const packages = [
+      { name: "Basic Health Check-Up", duration: "2 Hours", price: 1499, desc: "Covers essential body tests and vitals check." },
+      { name: "Advanced Health Package", duration: "1 Day", price: 3999, desc: "Detailed body analysis with imaging tests." },
+      { name: "Executive Health Package", duration: "2 Days", price: 6999, desc: "Full-body diagnosis with specialist consultation." },
+      { name: "Heart & Cardio Package", duration: "1 Day", price: 2999, desc: "Focused heart check-up including ECG and cholesterol test." },
+      { name: "Women’s Wellness Package", duration: "1 Day", price: 3499, desc: "Includes hormonal and reproductive health screening." },
+      { name: "Senior Citizen Package", duration: "2 Days", price: 4499, desc: "Tailored for elderly patients with chronic care focus." },
+      { name: "Fitness & Nutrition Package", duration: "4 Hours", price: 2499, desc: "Assess your physical fitness and nutritional status." },
+      { name: "Diabetes Care Package", duration: "3 Hours", price: 1999, desc: "Includes fasting sugar, HbA1c, and diet consultation." }
+    ];
+
+    const packageGrid = document.getElementById("packageGrid");
+
+    packages.forEach(pkg => {
+      const card = document.createElement("div");
+      card.className = "package-card";
+      card.innerHTML = `
+        <h3 class="package-title">${pkg.name}</h3>
+        <p><strong>Duration:</strong> ${pkg.duration}</p>
+        <p class="price-tag">₹${pkg.price}</p>
+        <p>${pkg.desc}</p>
+        <button class="btn" onclick="openBooking('${pkg.name}')">Book Now</button>
+      `;
+      packageGrid.appendChild(card);
+    });
+
+    const bookingModal = document.getElementById("bookingModal");
+    const toast = document.getElementById("toastMsg");
+
+    function openBooking(pkgName) {
+      bookingModal.style.display = "flex";
+      document.getElementById("bookingPackageName").value = pkgName;
+    }
+
+    document.getElementById("bookingClose").onclick = () => bookingModal.style.display = "none";
+
+    window.onclick = (e) => { if (e.target === bookingModal) bookingModal.style.display = "none"; };
+
+  
+    document.getElementById("bookingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const templateParams = {
+        name: form.name.value,
+        email: form.email.value,
+        contact: form.contact.value,
+        package: form.package.value
+      };
+
+      emailjs.send("service_cc1agqh", "template_e3qpeif", templateParams)
+        .then(() => {
+          bookingModal.style.display = "none";
+          toast.innerText = `✅ Booking confirmed! Email sent to ${form.email.value}`;
+          toast.style.display = "block";
+          setTimeout(() => toast.style.display = "none", 4000);
+          form.reset();
+        })
+        .catch(() => {
+          toast.innerText = "❌ Email sending failed. Please try again.";
+          toast.style.display = "block";
+          setTimeout(() => toast.style.display = "none", 4000);
+        });
+    });
+  </script>
+</body>
+</html>
