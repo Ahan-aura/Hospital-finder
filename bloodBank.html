@@ -484,37 +484,95 @@
     }
 
     /* Responsive Design */
+    /* Tablet & Mobile Styles */
     @media (max-width: 768px) {
+      header {
+        padding: 1rem 5%;
+      }
+      
       header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
       }
 
       .container {
-        padding: 25px;
-        margin: 20px;
+        padding: 20px 5%;
+        margin: 15px 0;
       }
 
       h2 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
       }
 
       nav {
+        flex-wrap: wrap;
         gap: 10px;
+        justify-content: center;
       }
 
       nav button {
-        padding: 10px 20px;
+        padding: 10px 18px;
         font-size: 0.9rem;
+        flex: 1 1 auto;
+        min-width: 120px;
       }
 
       .blood-buttons {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
       }
 
       .blood-buttons button {
+        padding: 18px;
+        font-size: 1.2rem;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      input, select, textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+      }
+      
+      .stock-list, .donor-list {
+        gap: 15px;
+      }
+      
+      .stock-item, .donor-item {
+        padding: 15px;
+      }
+    }
+    
+    /* Small Mobile Styles */
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .container {
+        padding: 15px 3%;
+        margin: 10px 0;
+      }
+      
+      nav button {
+        font-size: 0.85rem;
+        padding: 8px 15px;
+        min-width: 100px;
+      }
+      
+      .blood-buttons {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .blood-buttons button {
         padding: 15px;
         font-size: 1.1rem;
+      }
+      
+      h2 {
+        font-size: 1.2rem;
       }
     }
 
@@ -535,6 +593,25 @@
   </style>
 </head>
 <body>
+  <!-- Top Navigation Bar -->
+  <div style="position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); box-shadow: 0 2px 20px rgba(0,0,0,0.1); z-index: 1000; animation: slideDown 0.5s ease-out;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+      <a href="index.html" style="font-size: 1.5rem; font-weight: 700; color: #02475b; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-heartbeat" style="font-size: 1.8rem; color: #12d8c5;"></i>
+        HealthCare Plus
+      </a>
+      <nav style="display: flex; gap: 2rem; list-style: none;">
+        <a href="index.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Home</a>
+        <a href="find.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Find a Doctor</a>
+        <a href="consult.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Consult Online</a>
+        <a href="bookings.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">My Bookings</a>
+        <a href="bloodBank.html" style="text-decoration: none; color: #b30000; font-weight: 600; border-bottom: 2px solid #b30000; transition: color 0.3s;">Blood Bank</a>
+        <a href="contact.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Contact</a>
+      </nav>
+    </div>
+  </div>
+  
+  <div style="height: 80px;"></div>
 
   <header>
     <h1>Blood Bank & Availability Checker</h1>

@@ -671,76 +671,136 @@
         }
 
         /* Media Queries - Enhanced Responsiveness */
+        /* Tablet & Mobile Styles */
         @media (max-width: 768px) {
+            .hero {
+                padding: 50px 5%;
+                min-height: 250px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
             .filter-box {
                 flex-direction: column;
-                gap: 15px;
-                padding: 20px;
+                gap: 12px;
+                padding: 15px 5%;
             }
 
             .filter-group, .sort-group {
                 width: 100%;
-                justify-content: center;
             }
 
             .filter-box select, .filter-box input[type="text"] {
+                width: 100%;
                 min-width: 100%;
+                font-size: 16px; /* Prevents zoom on iOS */
             }
 
             .doctor-list {
                 grid-template-columns: 1fr;
                 gap: 20px;
-                padding: 0 10px;
+                padding: 0 5%;
+            }
+            
+            .doctor-card {
+                max-width: 100%;
             }
 
             .info-section {
-                padding: 25px 25px 20px;
+                padding: 20px;
             }
 
             .details-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 15px;
-            }
-
-            .hero {
-                padding: 60px 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
 
             .modal-content, .bookings-content {
-                margin: 10% auto;
+                margin: 5% auto;
                 width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .booking-item {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 10px;
+                padding: 15px;
             }
 
             .view-bookings {
-                bottom: 10px;
-                right: 10px;
+                bottom: 15px;
+                right: 15px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.3em;
+            }
+            
+            .form-group input,
+            .form-group select {
+                font-size: 16px;
+            }
+        }
+
+        /* Small Mobile Styles */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            
+            .filter-box {
+                padding: 12px 3%;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .info-section {
+                padding: 15px;
+            }
+            
+            .doctor-card {
+                padding: 15px;
+            }
+            
+            .view-bookings {
                 width: 50px;
                 height: 50px;
                 font-size: 1.2em;
             }
         }
-
-        @media (max-width: 480px) {
-            .details-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .doctor-name {
-                font-size: 1.5em;
-            }
-        }
     </style>
 </head>
 <body>
+    <!-- Header Navigation -->
+    <header style="position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); box-shadow: 0 2px 20px rgba(0,0,0,0.1); z-index: 1000; animation: slideDown 0.5s ease-out;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <a href="index.html" style="font-size: 1.5rem; font-weight: 700; color: #02475b; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-heartbeat" style="font-size: 1.8rem; color: #12d8c5;"></i>
+                HealthCare Plus
+            </a>
+            <nav style="display: flex; gap: 2rem; list-style: none;">
+                <a href="index.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Home</a>
+                <a href="find.html" style="text-decoration: none; color: #02475b; font-weight: 600; border-bottom: 2px solid #12d8c5; transition: color 0.3s;">Find a Doctor</a>
+                <a href="consult.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Consult Online</a>
+                <a href="bookings.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">My Bookings</a>
+                <a href="bloodBank.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Blood Bank</a>
+                <a href="contact.html" style="text-decoration: none; color: #1a1a1a; font-weight: 500; transition: color 0.3s;">Contact</a>
+            </nav>
+        </div>
+    </header>
+
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" style="margin-top: 80px;">
         <h1>EliteCare</h1>
         <p>Discover Top-Tier Healthcare Professionals Tailored to Your Needs</p>
         <a href="#doctors" class="cta-btn"><i class="fas fa-search"></i> Find Your Doctor</a>

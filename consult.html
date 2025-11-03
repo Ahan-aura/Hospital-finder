@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Consultation - HealthCare Plus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Razorpay Payment Gateway -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #02475b;
+            --primary-dark: #04677f;
+            --secondary: #05596b;
+            --accent: #12d8c5;
+            --bg-light: #f3f7fa;
+            --card-bg: #fff;
+            --text-dark: #1a1a1a;
+            --text-light: #95a1be;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #dc2626;
+            --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+            --shadow-large: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --border-radius: 18px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-medium);
+            z-index: 1000;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 5rem 2rem 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
+
+        .stat-item:nth-child(1) { animation-delay: 0.3s; }
+        .stat-item:nth-child(2) { animation-delay: 0.4s; }
+        .stat-item:nth-child(3) { animation-delay: 0.5s; }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Consultation Types Grid */
+        .consultation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .consultation-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out backwards;
+            display: flex;
+            flex-direction: column;
+            min-height: 580px;
+        }
+
+        .consultation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(18, 216, 197, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .consultation-card:hover::before {
+            left: 100%;
+        }
+
+        .consultation-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-large);
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .consultation-card:nth-child(1) { animation-delay: 0.1s; }
+        .consultation-card:nth-child(2) { animation-delay: 0.2s; }
+        .consultation-card:nth-child(3) { animation-delay: 0.3s; }
+        .consultation-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .card-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(18, 216, 197, 0.3);
+            transition: var(--transition);
+        }
+
+        .consultation-card:hover .card-icon {
+            transform: rotateY(360deg) scale(1.1);
+            box-shadow: 0 15px 40px rgba(18, 216, 197, 0.5);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .card-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: auto;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .card-features li {
+            padding: 0.5rem 0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-features li i {
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        .book-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .book-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(2, 71, 91, 0.3);
+        }
+
+        /* Booking Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-large);
+            animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .modal-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-light);
+            color: var(--error);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--bg-light);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(18, 216, 197, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(2, 71, 91, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .success-modal.active {
+            display: flex;
+        }
+
+        .success-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: var(--shadow-large);
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            margin: auto;
+        }
+
+        .success-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .success-content::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: 10px;
+        }
+
+        .success-content::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+            animation: successPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+            0%, 100% { box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 10px 60px rgba(16, 185, 129, 0.5); }
+        }
+
+        .booking-details {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .booking-details p {
+            margin: 0.4rem 0;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .booking-details strong {
+            color: var(--primary);
+        }
+
+        .booking-id {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            letter-spacing: 2px;
+        }
+
+        .success-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .success-content p {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        /* Tablet & Mobile Styles */
+        @media (max-width: 768px) {
+            header > div {
+                padding: 1rem 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                display: none; /* Hide on mobile, can add hamburger menu later */
+            }
+            
+            .hero {
+                padding: 50px 5%;
+            }
+            
+            .hero h1 { 
+                font-size: 2rem; 
+                line-height: 1.2;
+            }
+            
+            .hero p { 
+                font-size: 1rem; 
+            }
+            
+            .stats { 
+                flex-direction: column;
+                gap: 1.5rem; 
+            }
+            
+            .stat-item {
+                width: 100%;
+            }
+            
+            .stat-number { 
+                font-size: 2.5rem; 
+            }
+            
+            .section-title { 
+                font-size: 1.8rem; 
+            }
+            
+            .consultation-grid { 
+                grid-template-columns: 1fr;
+                gap: 25px;
+                padding: 0 5%;
+            }
+            
+            .consult-card {
+                padding: 25px;
+            }
+            
+            .form-row { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .modal-content { 
+                padding: 1.5rem;
+                width: 95%;
+                margin: 5% auto;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .success-card {
+                padding: 1.5rem;
+            }
+        }
+        
+        /* Small Mobile Styles */
+        @media (max-width: 480px) {
+            .hero h1 { 
+                font-size: 1.7rem; 
+            }
+            
+            .hero p { 
+                font-size: 0.95rem; 
+            }
+            
+            .stat-number { 
+                font-size: 2rem; 
+            }
+            
+            .section-title { 
+                font-size: 1.5rem; 
+            }
+            
+            .consult-card {
+                padding: 20px;
+            }
+            
+            .icon-wrapper {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            .modal-content {
+                padding: 1rem;
+            }
+            
+            .success-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 3px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Success Modal Animations */
+        @keyframes checkmark {
+            0% {
+                stroke-dashoffset: 100;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .success-checkmark {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+        }
+
+        .success-checkmark circle {
+            stroke: var(--success);
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 300;
+            animation: checkmark 0.6s ease-in-out 0.3s backwards;
+        }
+
+        .success-checkmark path {
+            stroke: var(--success);
+            stroke-width: 4;
+            fill: none;
+            stroke-linecap: round;
+            stroke-dasharray: 60;
+            stroke-dashoffset: 60;
+            animation: checkmark 0.4s ease-in-out 0.6s forwards;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3),
+                           0 0 20px rgba(16, 185, 129, 0.2);
+            }
+            50% {
+                box-shadow: 0 10px 60px rgba(16, 185, 129, 0.5),
+                           0 0 40px rgba(16, 185, 129, 0.4);
+            }
+        }
+
+        .success-icon {
+            animation: successPulse 1s ease-in-out infinite, glowPulse 2s ease-in-out infinite;
+        }
+
+        .booking-details {
+            animation: slideInFromBottom 0.5s ease-out 0.8s backwards;
+        }
+
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .booking-id {
+            animation: scaleInBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.5s backwards;
+        }
+
+        @keyframes scaleInBounce {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Info Notification Box */
+        .info-notification {
+            background: linear-gradient(135deg, rgba(18, 216, 197, 0.1), rgba(16, 185, 129, 0.1));
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+            animation: slideInFromBottom 0.5s ease-out 1s backwards;
+        }
+
+        .info-notification i {
+            color: var(--accent);
+            margin-right: 0.5rem;
+        }
+
+        /* Success Modal Buttons */
+        .success-modal .submit-btn {
+            padding: 0.9rem 1.5rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive for success modal */
+        @media (max-width: 768px) {
+            .success-content {
+                padding: 1.5rem;
+                max-height: 90vh;
+            }
+            
+            .success-content h2 {
+                font-size: 1.5rem;
+            }
+            
+            .booking-id {
+                font-size: 1.1rem;
+                padding: 0.6rem;
+            }
+            
+            .booking-details p {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-heartbeat"></i>
+                HealthCare Plus
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="find.html">Find a Doctor</a></li>
+                    <li><a href="consult.html" class="active">Consult Online</a></li>
+                    <li><a href="bookings.html">My Bookings</a></li>
+                    <li><a href="bloodBank.html">Blood Bank</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Online Consultation</h1>
+            <p>Connect with experienced doctors from anywhere, anytime. Professional healthcare at your fingertips.</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="500">0</span>
+                    <span class="stat-label">Expert Doctors</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="50000">0</span>
+                    <span class="stat-label">Consultations</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="95">0</span>
+                    <span class="stat-label">% Satisfaction</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="section-title">Choose Your Consultation Type</h2>
+        
+        <div class="consultation-grid">
+            <!-- Video Consultation -->
+            <div class="consultation-card" onclick="openBookingModal('video')">
+                <div class="card-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3 class="card-title">Video Consultation</h3>
+                <p class="card-description">Face-to-face video consultation with doctors</p>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> HD Video Call</li>
+                    <li><i class="fas fa-check-circle"></i> Screen Sharing</li>
+                    <li><i class="fas fa-check-circle"></i> 30 Min Session</li>
+                    <li><i class="fas fa-check-circle"></i> E-Prescription</li>
+                </ul>
+                <button class="book-btn">Book Now - ₹499</button>
+            </div>
+
+            <!-- Audio Consultation -->
+            <div class="consultation-card" onclick="openBookingModal('audio')">
+                <div class="card-icon">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3 class="card-title">Audio Call</h3>
+                <p class="card-description">Voice consultation for quick medical advice</p>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Voice Call</li>
+                    <li><i class="fas fa-check-circle"></i> 20 Min Session</li>
+                    <li><i class="fas fa-check-circle"></i> Instant Connect</li>
+                    <li><i class="fas fa-check-circle"></i> Follow-up Notes</li>
+                </ul>
+                <button class="book-btn">Book Now - ₹299</button>
+            </div>
+
+            <!-- Chat Consultation -->
+            <div class="consultation-card" onclick="openBookingModal('chat')">
+                <div class="card-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 class="card-title">Chat Consultation</h3>
+                <p class="card-description">Text-based consultation with doctors</p>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Text Chat</li>
+                    <li><i class="fas fa-check-circle"></i> Image Sharing</li>
+                    <li><i class="fas fa-check-circle"></i> Anytime Access</li>
+                    <li><i class="fas fa-check-circle"></i> 24hr Response</li>
+                </ul>
+                <button class="book-btn">Book Now - ₹199</button>
+            </div>
+
+            <!-- Emergency Consultation -->
+            <div class="consultation-card" onclick="openBookingModal('emergency')">
+                <div class="card-icon">
+                    <i class="fas fa-ambulance"></i>
+                </div>
+                <h3 class="card-title">Emergency Support</h3>
+                <p class="card-description">Urgent medical consultation available 24/7</p>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> Priority Support</li>
+                    <li><i class="fas fa-check-circle"></i> Instant Connect</li>
+                    <li><i class="fas fa-check-circle"></i> 24/7 Available</li>
+                    <li><i class="fas fa-check-circle"></i> Expert Guidance</li>
+                </ul>
+                <button class="book-btn">Book Now - ₹999</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Consultation</h2>
+                <button class="close-btn" onclick="closeBookingModal()">×</button>
+            </div>
+            
+            <form id="consultationForm">
+                <div class="form-group">
+                    <label for="patientName">Patient Name *</label>
+                    <input type="text" id="patientName" name="patientName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" name="age" min="1" max="120" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="consultationType">Consultation Type *</label>
+                    <select id="consultationType" name="consultationType" required disabled>
+                        <option value="video">Video Consultation</option>
+                        <option value="audio">Audio Call</option>
+                        <option value="chat">Chat Consultation</option>
+                        <option value="emergency">Emergency Support</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialty">Medical Specialty *</label>
+                    <select id="specialty" name="specialty" required>
+                        <option value="">Select Specialty</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Gynecology">Gynecology</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                        <option value="ENT">ENT</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="Dentistry">Dentistry</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="preferredDate">Preferred Date *</label>
+                        <input type="date" id="preferredDate" name="preferredDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferredTime">Preferred Time *</label>
+                        <input type="time" id="preferredTime" name="preferredTime" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="symptoms">Symptoms / Reason for Consultation *</label>
+                    <textarea id="symptoms" name="symptoms" required placeholder="Please describe your symptoms or reason for consultation..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Confirm Booking
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+        <div class="success-content">
+            <!-- Animated Checkmark SVG -->
+            <svg class="success-checkmark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45"/>
+                <path d="M25,50 L40,65 L75,30"/>
+            </svg>
+            
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            
+            <h3>🎉 Booking Confirmed!</h3>
+            <p style="color: var(--success); font-weight: 600; font-size: 1.1rem; margin: 1rem 0;">Your consultation has been successfully scheduled</p>
+            
+            <div class="booking-id" id="bookingId">HC12345678</div>
+            <div class="booking-details" id="bookingDetails"></div>
+            
+            <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 12px; padding: 1rem; margin: 1.5rem 0; border-left: 4px solid var(--success);">
+                <p style="margin: 0; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-info-circle" style="color: var(--success);"></i>
+                    <span>You will receive confirmation via email & SMS</span>
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="submit-btn" onclick="closeSuccessModal()" style="background: linear-gradient(135deg, var(--success), #059669); flex: 1;">
+                    <i class="fas fa-check-circle"></i> Awesome!
+                </button>
+                <button class="submit-btn" onclick="window.location.href='bookings.html'" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); flex: 1;">
+                    <i class="fas fa-calendar-check"></i> My Bookings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        
+        // Firebase Configuration (using same config as appo.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKd59GeEC9TUZYKWjouyfppRwnkJSxxUQ",
+            authDomain: "appo-e6f45.firebaseapp.com",
+            projectId: "appo-e6f45",
+            storageBucket: "appo-e6f45.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global variables
+        window.currentConsultationType = 'video';
+        window.db = db;
+        window.addDoc = addDoc;
+        window.collection = collection;
+        window.serverTimestamp = serverTimestamp;
+
+        console.log('Firebase initialized successfully');
+    </script>
+
+    <script>
+        // Counter Animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current).toLocaleString();
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target.toLocaleString();
+                    }
+                };
+
+                updateCounter();
+            });
+        }
+
+        // Start counter animation when page loads
+        window.addEventListener('load', animateCounters);
+
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('preferredDate');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+        });
+
+        // Open booking modal
+        function openBookingModal(type) {
+            window.currentConsultationType = type;
+            const modal = document.getElementById('bookingModal');
+            const consultationTypeSelect = document.getElementById('consultationType');
+            
+            consultationTypeSelect.value = type;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close booking modal
+        function closeBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('consultationForm').reset();
+        }
+
+        // View bookings
+        function viewBookings() {
+            const bookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+            if (bookings.length === 0) {
+                alert('No bookings found!');
+                return;
+            }
+            
+            closeSuccessModal();
+            
+            // Create a modal to show bookings
+            const bookingsList = bookings.map((booking, index) => `
+                <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid var(--accent);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <h3 style="color: var(--primary); margin: 0; font-weight: 700;">${booking.bookingId}</h3>
+                        <span style="background: var(--success); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">${booking.status}</span>
+                    </div>
+                    <p style="margin: 0.5rem 0;"><strong>Patient:</strong> ${booking.patientName}</p>
+                    <p style="margin: 0.5rem 0;"><strong>Type:</strong> ${booking.consultationType}</p>
+                    <p style="margin: 0.5rem 0;"><strong>Date:</strong> ${new Date(booking.preferredDate).toLocaleDateString()}</p>
+                    <p style="margin: 0.5rem 0;"><strong>Time:</strong> ${booking.preferredTime}</p>
+                </div>
+            `).join('');
+            
+            alert('Your Bookings:\n\n' + bookings.map(b => `${b.bookingId} - ${b.patientName} - ${b.preferredDate}`).join('\n'));
+        }
+
+        // Generate booking ID
+        function generateBookingId() {
+            const prefix = 'HC';
+            const timestamp = Date.now().toString().slice(-8);
+            return prefix + timestamp;
+        }
+
+        // Send email confirmation using EmailJS
+        async function sendEmailConfirmation(bookingData) {
+            try {
+                // Initialize EmailJS (You need to sign up at emailjs.com and get your keys)
+                // emailjs.init("YOUR_PUBLIC_KEY");
+                
+                // For now, just log - user needs to configure EmailJS
+                console.log('Email would be sent to:', bookingData.email);
+                console.log('Booking details:', bookingData);
+                
+                // Uncomment and configure when ready:
+                /*
+                const templateParams = {
+                    to_email: bookingData.email,
+                    patient_name: bookingData.patientName,
+                    booking_id: bookingData.bookingId,
+                    consultation_type: bookingData.consultationType,
+                    date: new Date(bookingData.preferredDate).toLocaleDateString(),
+                    time: bookingData.preferredTime,
+                    specialty: bookingData.specialty
+                };
+                
+                await emailjs.send(
+                    'YOUR_SERVICE_ID',
+                    'YOUR_TEMPLATE_ID',
+                    templateParams
+                );
+                
+                console.log('Email sent successfully!');
+                */
+            } catch (error) {
+                console.error('Email sending failed:', error);
+                // Don't block the booking if email fails
+            }
+        }
+
+        // Razorpay Payment Integration
+        async function processPayment(amount, bookingData) {
+            return new Promise((resolve, reject) => {
+                const options = {
+                    key: 'rzp_test_1234567890', // TODO: Replace with your Razorpay key
+                    amount: amount * 100, // Amount in paise
+                    currency: 'INR',
+                    name: 'HealthCare Plus',
+                    description: `${bookingData.consultationType} Consultation`,
+                    image: 'https://static.vecteezy.com/system/resources/previews/046/305/217/original/hospital-logo-design-illustration-vector.jpg',
+                    handler: function (response) {
+                        // Payment successful
+                        bookingData.paymentId = response.razorpay_payment_id;
+                        bookingData.paymentStatus = 'paid';
+                        console.log('Payment successful:', response);
+                        resolve(response);
+                    },
+                    prefill: {
+                        name: bookingData.patientName,
+                        email: bookingData.email,
+                        contact: bookingData.phone
+                    },
+                    theme: {
+                        color: '#02475b'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            reject(new Error('Payment cancelled'));
+                        }
+                    }
+                };
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            });
+        }
+
+        // Custom Payment Status Modal
+        function showPaymentModal(title, message, type = 'info') {
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.payment-status-modal');
+            if (existingModal) existingModal.remove();
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'payment-status-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            const iconMap = {
+                'error': '❌',
+                'info': 'ℹ️',
+                'warning': '⚠️'
+            };
+
+            const colorMap = {
+                'error': '#dc2626',
+                'info': '#02475b',
+                'warning': '#f59e0b'
+            };
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 40px;
+                    border-radius: 20px;
+                    max-width: 450px;
+                    width: 90%;
+                    text-align: center;
+                    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                ">
+                    <div style="
+                        font-size: 60px;
+                        margin-bottom: 20px;
+                        animation: bounceIn 0.6s ease;
+                    ">${iconMap[type]}</div>
+                    <h2 style="
+                        color: ${colorMap[type]};
+                        margin-bottom: 15px;
+                        font-size: 28px;
+                        font-weight: 700;
+                    ">${title}</h2>
+                    <p style="
+                        color: #666;
+                        margin-bottom: 30px;
+                        font-size: 16px;
+                        line-height: 1.6;
+                    ">${message}</p>
+                    <button onclick="this.closest('.payment-status-modal').remove()" style="
+                        background: linear-gradient(135deg, ${colorMap[type]}, ${colorMap[type]}dd);
+                        color: white;
+                        border: none;
+                        padding: 15px 40px;
+                        border-radius: 50px;
+                        font-size: 16px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px ${colorMap[type]}40;
+                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px ${colorMap[type]}60';" 
+                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px ${colorMap[type]}40';">
+                        Okay
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Auto close after 5 seconds for info messages
+            if (type === 'info') {
+                setTimeout(() => {
+                    if (document.body.contains(modal)) {
+                        modal.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => modal.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+
+
+        // Form submission
+        document.getElementById('consultationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('loading');
+            submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+
+            // Simulate processing time for smooth UX
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            try {
+                // Get form data
+                const formData = {
+                    patientName: document.getElementById('patientName').value,
+                    age: document.getElementById('age').value,
+                    gender: document.getElementById('gender').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    consultationType: document.getElementById('consultationType').value,
+                    specialty: document.getElementById('specialty').value,
+                    preferredDate: document.getElementById('preferredDate').value,
+                    preferredTime: document.getElementById('preferredTime').value,
+                    symptoms: document.getElementById('symptoms').value,
+                    bookingId: generateBookingId(),
+                    status: 'Confirmed',
+                    createdAt: new Date().toISOString()
+                };
+
+                // Store in localStorage for now (can be replaced with Firebase later)
+                const bookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+                bookings.push(formData);
+                localStorage.setItem('consultations', JSON.stringify(bookings));
+                
+                // Send email confirmation (optional - configure EmailJS)
+                sendEmailConfirmation(formData);
+                
+                console.log('Consultation booked successfully!', formData);
+
+                // Show success modal with celebration
+                document.getElementById('bookingId').textContent = formData.bookingId;
+                
+                const consultationTypes = {
+                    'video': 'Video Consultation',
+                    'audio': 'Audio Call',
+                    'chat': 'Chat Consultation',
+                    'emergency': 'Emergency Support'
+                };
+
+                const prices = {
+                    'video': 499,
+                    'audio': 299,
+                    'chat': 199,
+                    'emergency': 999
+                };
+
+                // Initialize payment
+                const amount = prices[formData.consultationType];
+                await processPayment(amount, formData);
+
+                document.getElementById('bookingDetails').innerHTML = `
+                    <p><strong>Patient:</strong> ${formData.patientName}</p>
+                    <p><strong>Type:</strong> ${consultationTypes[formData.consultationType]}</p>
+                    <p><strong>Specialty:</strong> ${formData.specialty}</p>
+                    <p><strong>Date:</strong> ${new Date(formData.preferredDate).toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p><strong>Time:</strong> ${formData.preferredTime}</p>
+                    <p><strong>Contact:</strong> ${formData.phone}</p>
+                    <p><strong>Amount:</strong> ₹${amount}</p>
+                `;
+
+                closeBookingModal();
+                document.getElementById('successModal').classList.add('active');
+
+                // Trigger confetti animation
+                createConfetti();
+                
+                // Play success sound (optional - browser dependent)
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBiqCzvLaizsJHGS57OmlUhEJUKXh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU2jdXux3MpBSp+zPLakjsIGmW56+ejUBEKTqPh8bRiHAU=');
+                    audio.volume = 0.3;
+                    audio.play().catch(e => console.log('Audio play failed:', e));
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+
+            } catch (error) {
+                console.error('Error booking consultation:', error);
+                
+                // Handle different error types
+                if (error.message === 'Payment cancelled') {
+                    showPaymentModal('Payment Cancelled', 'You have cancelled the payment. Please try again when ready.', 'info');
+                } else {
+                    showPaymentModal('Payment Failed', error.message || 'There was an error processing your payment. Please try again.', 'error');
+                }
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.textContent = 'Confirm Booking';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Close modals on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeBookingModal();
+                closeSuccessModal();
+            }
+        });
+
+        // Close modal on outside click
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target.id === 'bookingModal') {
+                closeBookingModal();
+            }
+        });
+
+        document.getElementById('successModal').addEventListener('click', (e) => {
+            if (e.target.id === 'successModal') {
+                closeSuccessModal();
+            }
+        });
+
+        // Confetti Animation
+        function createConfetti() {
+            const colors = ['#12d8c5', '#02475b', '#10b981', '#f59e0b', '#dc2626', '#8b5cf6'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.opacity = '1';
+                    confetti.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.transition = 'all 3s ease-out';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Animate
+                    setTimeout(() => {
+                        confetti.style.top = '120vh';
+                        confetti.style.left = (parseFloat(confetti.style.left) + (Math.random() * 40 - 20)) + '%';
+                        confetti.style.opacity = '0';
+                        confetti.style.transform = 'rotate(' + (Math.random() * 720 + 360) + 'deg)';
+                    }, 10);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 10);
+            }
+        }
+    </script>
+</body>
+</html>

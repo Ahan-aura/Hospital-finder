@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - HealthCare Plus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Main colors */
+            --primary: #02475b;
+            --secondary: #037d97;
+            --accent: #12d8c5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #02475b, #037d97);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: #12d8c5;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #12d8c5;
+        }
+
+        .nav-links a.active {
+            color: #12d8c5;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #02475b, #037d97);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Filter tabs */
+        .filter-section {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-tab:hover {
+            border-color: #12d8c5;
+            background: #f0fdf4;
+        }
+
+        .filter-tab.active {
+            background: #02475b;
+            color: white;
+            border-color: #02475b;
+        }
+
+        .filter-tab .badge {
+            background: #12d8c5;
+            color: #02475b;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .filter-tab.active .badge {
+            background: white;
+            color: #02475b;
+        }
+
+        /* Bookings section */
+        .bookings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .booking-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #12d8c5;
+        }
+
+        .section-header i {
+            font-size: 1.8rem;
+            color: #12d8c5;
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #02475b;
+        }
+
+        .section-header .count {
+            background: #12d8c5;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        /* Booking cards */
+        .booking-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            border-left: 4px solid #12d8c5;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        .booking-type {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .booking-type-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .booking-type-icon.video {
+            background: #3b82f6;
+        }
+
+        .booking-type-icon.audio {
+            background: #8b5cf6;
+        }
+
+        .booking-type-icon.chat {
+            background: #10b981;
+        }
+
+        .booking-type-icon.emergency {
+            background: #ef4444;
+        }
+
+        .booking-type-info h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #02475b;
+            margin-bottom: 3px;
+        }
+
+        .booking-id {
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-family: monospace;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.confirmed {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-badge.cancelled {
+            background: #6b7280;
+            color: white;
+        }
+
+        .card-body {
+            margin: 15px 0;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 5px 0;
+            background: #f9fafb;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .info-row:hover {
+            background: #f0fdfa;
+        }
+
+        .info-row i {
+            color: #12d8c5;
+            font-size: 1rem;
+            width: 20px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #1f2937;
+            min-width: 70px;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #6b7280;
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e5e7eb;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            background: #02475b;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #013243;
+        }
+
+        .action-btn.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .action-btn.success:hover {
+            background: #059669;
+        }
+
+        .action-btn.danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .action-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        /* Loading */
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top-color: #12d8c5;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+        }
+
+        /* Stats cards */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #12d8c5;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #02475b;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        /* FAB button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: #12d8c5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba(18, 216, 197, 0.4);
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 999;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(18, 216, 197, 0.6);
+        }
+
+        /* Tablet & Mobile Styles */
+        @media (max-width: 768px) {
+            header > div {
+                padding: 1rem 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 50px 5%;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 0 5%;
+            }
+            
+            .stat-card {
+                padding: 20px 15px;
+            }
+
+            .filter-tabs {
+                gap: 8px;
+                flex-wrap: wrap;
+                padding: 0 5%;
+            }
+
+            .filter-tab {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                flex: 1 1 auto;
+                min-width: 100px;
+            }
+
+            .bookings-grid {
+                grid-template-columns: 1fr;
+                padding: 0 5%;
+                gap: 20px;
+            }
+            
+            .booking-card {
+                padding: 20px 15px;
+            }
+
+            .section-header h2 {
+                font-size: 1.4rem;
+            }
+            
+            .action-btns {
+                gap: 8px;
+            }
+            
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Small Mobile Styles */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .filter-tab {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+                min-width: 90px;
+            }
+            
+            .booking-card {
+                padding: 15px;
+            }
+            
+            .section-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-heartbeat"></i>
+                HealthCare Plus
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="find.html">Find a Doctor</a></li>
+                    <li><a href="consult.html">Consult Online</a></li>
+                    <li><a href="bookings.html" class="active">My Bookings</a></li>
+                    <li><a href="bloodBank.html">Blood Bank</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>My Bookings</h1>
+            <p>Track and manage all your healthcare consultations in one place</p>
+        </div>
+    </section>
+
+    <!-- Stats Summary -->
+    <div class="stats-summary">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+            <div class="stat-number" id="totalBookings">0</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number" id="confirmedBookings">0</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-number" id="pendingBookings">0</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+            <div class="stat-number" id="totalSpent">₹0</div>
+            <div class="stat-label">Total Spent</div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-section">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">
+                <i class="fas fa-list"></i>
+                All Bookings
+                <span class="badge" id="allCount">0</span>
+            </button>
+            <button class="filter-tab" data-filter="video">
+                <i class="fas fa-video"></i>
+                Video Consultation
+                <span class="badge" id="videoCount">0</span>
+            </button>
+            <button class="filter-tab" data-filter="audio">
+                <i class="fas fa-phone"></i>
+                Audio Call
+                <span class="badge" id="audioCount">0</span>
+            </button>
+            <button class="filter-tab" data-filter="chat">
+                <i class="fas fa-comments"></i>
+                Chat Support
+                <span class="badge" id="chatCount">0</span>
+            </button>
+            <button class="filter-tab" data-filter="emergency">
+                <i class="fas fa-ambulance"></i>
+                Emergency
+                <span class="badge" id="emergencyCount">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bookings Container -->
+    <div class="bookings-container" id="bookingsContainer">
+        <div class="loading-container">
+            <div class="loader"></div>
+            <div class="loading-text">Loading your bookings...</div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" onclick="window.location.href='consult.html'" title="Book New Consultation">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <script>
+        // Supabase config - TODO: move to env file later
+        const SUPABASE_URL = 'https://ppfqkqzpvvjrrzobkwai.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwZnFrcXpwdnZqcnJ6b2Jrd2FpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA2MzAyMTcsImV4cCI6MjA0NjIwNjIxN30.I4lPrblHJ0p7hVgLDdJnqMh3RDHx56kAF1Bzu5QCXKM';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allBookings = [];
+        let currentFilter = 'all';
+
+        // Load everything when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadBookings();
+            setupFilterTabs();
+        });
+
+        // Get bookings from both supabase and localStorage
+        async function loadBookings() {
+            try {
+                // Check localStorage first
+                const localBookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+                
+                // Try to get from supabase too
+                const { data: supabaseBookings, error } = await supabase
+                    .from('consultations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.log('Supabase error, using localStorage:', error);
+                    allBookings = localBookings;
+                } else {
+                    // Merge both and remove duplicates
+                    const combined = [...supabaseBookings, ...localBookings];
+                    const uniqueBookings = combined.filter((booking, index, self) =>
+                        index === self.findIndex((b) => 
+                            (b.booking_id || b.bookingId) === (booking.booking_id || booking.bookingId)
+                        )
+                    );
+                    allBookings = uniqueBookings;
+                }
+
+                updateStats();
+                displayBookings(currentFilter);
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                // Fallback to localStorage
+                allBookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+                updateStats();
+                displayBookings(currentFilter);
+            }
+        }
+
+        // Update stats counters
+        function updateStats() {
+            const total = allBookings.length;
+            const confirmed = allBookings.filter(b => (b.status || 'Confirmed').toLowerCase() === 'confirmed').length;
+            const pending = allBookings.filter(b => (b.status || '').toLowerCase() === 'pending').length;
+            
+            // Price mapping for each consultation type
+            const priceMap = {
+                'video': 499,
+                'audio': 299,
+                'chat': 199,
+                'emergency': 999
+            };
+            
+            // Calculate total amount
+            const totalSpent = allBookings.reduce((sum, booking) => {
+                const type = (booking.consultation_type || booking.consultationType || '').toLowerCase();
+                return sum + (priceMap[type] || 0);
+            }, 0);
+
+            // Animate the numbers
+            animateCounter('totalBookings', total);
+            animateCounter('confirmedBookings', confirmed);
+            animateCounter('pendingBookings', pending);
+            
+            document.getElementById('totalSpent').textContent = `₹${totalSpent}`;
+
+            // Update badges on filter tabs
+            document.getElementById('allCount').textContent = total;
+            document.getElementById('videoCount').textContent = allBookings.filter(b => 
+                (b.consultation_type || b.consultationType || '').toLowerCase() === 'video'
+            ).length;
+            document.getElementById('audioCount').textContent = allBookings.filter(b => 
+                (b.consultation_type || b.consultationType || '').toLowerCase() === 'audio'
+            ).length;
+            document.getElementById('chatCount').textContent = allBookings.filter(b => 
+                (b.consultation_type || b.consultationType || '').toLowerCase() === 'chat'
+            ).length;
+            document.getElementById('emergencyCount').textContent = allBookings.filter(b => 
+                (b.consultation_type || b.consultationType || '').toLowerCase() === 'emergency'
+            ).length;
+        }
+
+        // Animate counter
+        function animateCounter(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const duration = 1000;
+            const steps = 30;
+            const increment = targetValue / steps;
+            let current = 0;
+            let step = 0;
+
+            const timer = setInterval(() => {
+                step++;
+                current = Math.min(current + increment, targetValue);
+                element.textContent = Math.round(current);
+
+                if (step >= steps) {
+                    element.textContent = targetValue;
+                    clearInterval(timer);
+                }
+            }, duration / steps);
+        }
+
+        // Display bookings based on filter
+        function displayBookings(filter) {
+            const container = document.getElementById('bookingsContainer');
+            
+            let filteredBookings = allBookings;
+            if (filter !== 'all') {
+                filteredBookings = allBookings.filter(booking => 
+                    (booking.consultation_type || booking.consultationType || '').toLowerCase() === filter
+                );
+            }
+
+            if (filteredBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No Bookings Found</h3>
+                        <p>You haven't booked any ${filter === 'all' ? '' : filter} consultations yet.</p>
+                        <button class="action-btn primary" onclick="window.location.href='consult.html'">
+                            <i class="fas fa-plus"></i>
+                            Book New Consultation
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by consultation type
+            const groupedBookings = {
+                video: [],
+                audio: [],
+                chat: [],
+                emergency: []
+            };
+
+            filteredBookings.forEach(booking => {
+                const type = (booking.consultation_type || booking.consultationType || '').toLowerCase();
+                if (groupedBookings[type]) {
+                    groupedBookings[type].push(booking);
+                }
+            });
+
+            let html = '';
+
+            // Display each type section
+            const typeConfig = {
+                video: { icon: 'fa-video', title: 'Video Consultations', color: '#3b82f6' },
+                audio: { icon: 'fa-phone', title: 'Audio Consultations', color: '#8b5cf6' },
+                chat: { icon: 'fa-comments', title: 'Chat Consultations', color: '#10b981' },
+                emergency: { icon: 'fa-ambulance', title: 'Emergency Consultations', color: '#ef4444' }
+            };
+
+            Object.keys(groupedBookings).forEach(type => {
+                if (groupedBookings[type].length > 0 && (filter === 'all' || filter === type)) {
+                    const config = typeConfig[type];
+                    html += `
+                        <div class="booking-section">
+                            <div class="section-header">
+                                <i class="fas ${config.icon}"></i>
+                                <h2>${config.title}</h2>
+                                <span class="count">${groupedBookings[type].length}</span>
+                            </div>
+                            <div class="bookings-grid">
+                                ${groupedBookings[type].map((booking, index) => createBookingCard(booking, type, index)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+
+            // Add staggered animation delays
+            document.querySelectorAll('.booking-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Create booking card HTML
+        function createBookingCard(booking, type, index) {
+            const bookingId = booking.booking_id || booking.bookingId || 'N/A';
+            const patientName = booking.patient_name || booking.patientName || 'N/A';
+            const age = booking.age || 'N/A';
+            const gender = booking.gender || 'N/A';
+            const phone = booking.phone || 'N/A';
+            const email = booking.email || 'N/A';
+            const specialty = booking.specialty || 'N/A';
+            const preferredDate = booking.preferred_date || booking.preferredDate || 'N/A';
+            const preferredTime = booking.preferred_time || booking.preferredTime || 'N/A';
+            const symptoms = booking.symptoms || 'N/A';
+            const status = booking.status || 'Confirmed';
+            const createdAt = booking.created_at || booking.createdAt || new Date().toISOString();
+
+            const priceMap = {
+                'video': '₹499',
+                'audio': '₹299',
+                'chat': '₹199',
+                'emergency': '₹999'
+            };
+
+            const iconMap = {
+                'video': 'fa-video',
+                'audio': 'fa-phone',
+                'chat': 'fa-comments',
+                'emergency': 'fa-ambulance'
+            };
+
+            const typeLabel = {
+                'video': 'Video Consultation',
+                'audio': 'Audio Call',
+                'chat': 'Chat Support',
+                'emergency': 'Emergency'
+            };
+
+            return `
+                <div class="booking-card" style="animation-delay: ${index * 0.1}s">
+                    <div class="card-header">
+                        <div class="booking-type">
+                            <div class="booking-type-icon ${type}">
+                                <i class="fas ${iconMap[type]}"></i>
+                            </div>
+                            <div class="booking-type-info">
+                                <h3>${typeLabel[type]}</h3>
+                                <div class="booking-id">ID: ${bookingId}</div>
+                            </div>
+                        </div>
+                        <span class="status-badge ${status.toLowerCase()}">${status}</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <i class="fas fa-user"></i>
+                            <span class="info-label">Patient:</span>
+                            <span class="info-value">${patientName}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-stethoscope"></i>
+                            <span class="info-label">Specialty:</span>
+                            <span class="info-value">${specialty}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-calendar"></i>
+                            <span class="info-label">Date:</span>
+                            <span class="info-value">${new Date(preferredDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-clock"></i>
+                            <span class="info-label">Time:</span>
+                            <span class="info-value">${preferredTime}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-phone"></i>
+                            <span class="info-label">Contact:</span>
+                            <span class="info-value">${phone}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-rupee-sign"></i>
+                            <span class="info-label">Amount:</span>
+                            <span class="info-value"><strong>${priceMap[type]}</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="action-btn primary" onclick="viewDetails('${bookingId}')">
+                            <i class="fas fa-eye"></i>
+                            View Details
+                        </button>
+                        <button class="action-btn success" onclick="downloadReceipt('${bookingId}')">
+                            <i class="fas fa-download"></i>
+                            Receipt
+                        </button>
+                        ${status.toLowerCase() === 'confirmed' ? `
+                            <button class="action-btn danger" onclick="cancelBooking('${bookingId}')">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Setup filter tabs
+        function setupFilterTabs() {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    displayBookings(currentFilter);
+                });
+            });
+        }
+
+        // View booking details
+        function viewDetails(bookingId) {
+            const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            if (booking) {
+                const details = `
+Booking Details
+═══════════════════════════════
+
+Booking ID: ${bookingId}
+Status: ${booking.status || 'Confirmed'}
+
+Patient Information:
+- Name: ${booking.patient_name || booking.patientName}
+- Age: ${booking.age} years
+- Gender: ${booking.gender}
+
+Consultation Details:
+- Type: ${booking.consultation_type || booking.consultationType}
+- Specialty: ${booking.specialty}
+- Date: ${booking.preferred_date || booking.preferredDate}
+- Time: ${booking.preferred_time || booking.preferredTime}
+
+Contact Information:
+- Phone: ${booking.phone}
+- Email: ${booking.email}
+
+Medical Information:
+- Symptoms: ${booking.symptoms}
+
+Payment:
+- Amount: ₹${booking.consultation_type === 'video' ? '499' : booking.consultation_type === 'audio' ? '299' : booking.consultation_type === 'chat' ? '199' : '999'}
+                `;
+                alert(details);
+            }
+        }
+
+        // Download receipt
+        function downloadReceipt(bookingId) {
+            alert(`Receipt for booking ${bookingId} will be downloaded.\n\n(Feature coming soon!)`);
+        }
+
+        // Cancel booking
+        async function cancelBooking(bookingId) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                // Update in localStorage
+                const localBookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+                const updatedLocal = localBookings.map(b => {
+                    if ((b.bookingId || b.booking_id) === bookingId) {
+                        return { ...b, status: 'Cancelled' };
+                    }
+                    return b;
+                });
+                localStorage.setItem('consultations', JSON.stringify(updatedLocal));
+
+                // Update in Supabase
+                try {
+                    await supabase
+                        .from('consultations')
+                        .update({ status: 'Cancelled' })
+                        .eq('booking_id', bookingId);
+                } catch (error) {
+                    console.log('Could not update Supabase:', error);
+                }
+
+                // Reload bookings
+                await loadBookings();
+                alert('Booking cancelled successfully!');
+            }
+        }
+    </script>
+</body>
+</html>
