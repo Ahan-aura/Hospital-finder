@@ -37,10 +37,19 @@
                         <label for="patientName" class="block text-sm font-medium text-gray-700 mb-1">Patient Name</label>
                         <input type="text" id="patientName" required class="w-full p-3 border border-gray-300 rounded-lg" placeholder="e.g., Jane Doe">
                     </div>
+                    
                     <div>
-                        <label for="doctor" class="block text-sm font-medium text-gray-700 mb-1">Doctor / Service</label>
-                        <input type="text" id="doctor" required class="w-full p-3 border border-gray-300 rounded-lg" placeholder="e.g., Dr. Adithya - General Physician (₹500)">
+                        <label for="doctor" class="block text-sm font-medium text-gray-700 mb-1">Doctor / Specialty</label>
+                        <select id="doctor" required class="w-full p-3 border border-gray-300 rounded-lg appearance-none">
+                            <option value="" disabled selected>Select Doctor or Specialty</option>
+                            <option value="Dr. Sharma - Cardiology">Dr. Sharma - Cardiology</option>
+                            <option value="Dr. Khan - Dentistry">Dr. Khan - Dentistry</option>
+                            <option value="Dr. Verma - Neurology">Dr. Verma - Neurology</option>
+                            <option value="Dr. Rao - General Practitioner">Dr. Rao - General Practitioner</option>
+                            <option value="Dr. Singh - Orthopedics">Dr. Singh - Orthopedics</option>
+                        </select>
                     </div>
+
                     <div>
                         <label for="appointmentDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
                         <input type="date" id="appointmentDate" required class="w-full p-3 border border-gray-300 rounded-lg" min="2025-01-01">
@@ -79,7 +88,7 @@
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, Timestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDKd59GeEC9TUZYKWjouyfppRwnkJSxxUQ",
@@ -135,9 +144,9 @@
         submitButton.textContent = 'Booking...';
 
         const patientName = document.getElementById('patientName').value.trim();
-        const doctor = document.getElementById('doctor').value;
-        const date = document.getElementById('appointmentDate').value;
-        const time = document.getElementById('appointmentTime').value;
+        const doctor = document.getElementById('doctor').value; 
+        const date = document.getElementById('appointmentDate').value; 
+        const time = document.getElementById('appointmentTime').value; 
         const symptoms = document.getElementById('symptoms').value.trim();
 
         if (!patientName || !doctor || !date || !time) {
@@ -149,12 +158,14 @@
 
         try {
             const appointmentDateTime = new Date(`${date}T${time}:00`);
-            if (appointmentDateTime.getFullYear() < 2024) {
-                showMessage('Validation Error', 'Please choose a valid future date.');
+
+            if (isNaN(appointmentDateTime.getTime())) {
+                showMessage('Validation Error', 'Invalid date or time format selected.');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Book Appointment';
                 return;
             }
+
             const newAppointment = {
                 patientName,
                 doctor,
@@ -166,6 +177,7 @@
                 bookedBy: userId,
                 status: 'confirmed'
             };
+            
             await addDoc(collection(db, appointmentsCollectionPath), newAppointment);
             showMessage('Success!', `Appointment booked successfully for ${doctor}.`);
             form.reset();
@@ -183,7 +195,8 @@
             console.error("Firestore not initialized.");
             return;
         }
-        const q = query(collection(db, appointmentsCollectionPath));
+        // Use orderBy('dateTime') to sort upcoming appointments correctly
+        const q = query(collection(db, appointmentsCollectionPath), orderBy('dateTime')); 
         onSnapshot(q, (snapshot) => {
             const appointments = [];
             snapshot.forEach((doc) => {
@@ -191,8 +204,11 @@
                 const sortableDate = data.dateTime?.toDate ? data.dateTime.toDate().getTime() : 0;
                 appointments.push({ id: doc.id, sortableDate, ...data });
             });
+            
+            // Filter to only show appointments whose time is now or in the future
             appointments.sort((a, b) => a.sortableDate - b.sortableDate);
-            renderAppointments(appointments.filter(app => app.sortableDate >= Date.now()));
+            const upcomingAppointments = appointments.filter(app => app.sortableDate >= Date.now()); 
+            renderAppointments(upcomingAppointments);
         }, (error) => {
             console.error("Error listening to appointments: ", error);
             appointmentsList.innerHTML = '<p class="text-red-500 text-center">Failed to load schedule. Check console for errors.</p>';
@@ -217,7 +233,14 @@
                 ? formatTimestamp(app.dateTime)
                 : (app.date + ' ' + (app.time || ''));
             const appointmentCard = document.createElement('div');
-            appointmentCard.className = 'p-4 border-l-4 rounded-lg border-blue-500 bg-blue-50 shadow-md transition duration-200 hover:shadow-lg';
+            
+            // Determine status class
+            let statusClass = 'border-blue-500 bg-blue-50';
+            if (app.status === 'Completed') statusClass = 'border-green-500 bg-green-50';
+            if (app.status === 'Cancelled') statusClass = 'border-red-500 bg-red-50';
+
+            appointmentCard.className = `p-4 border-l-4 rounded-lg ${statusClass} shadow-md transition duration-200 hover:shadow-lg`;
+            
             appointmentCard.innerHTML = `
                 <div class="font-bold text-lg text-gray-800">${app.patientName || 'Unknown'}</div>
                 <div class="text-sm text-gray-600 mt-1">${app.doctor || 'Doctor Unknown'}</div>
@@ -225,8 +248,8 @@
                 <div class="text-xs text-gray-400 mt-2 border-t pt-2">
                     Booked by User ID: <span class="truncate">${app.bookedBy || 'N/A'}</span>
                 </div>
-                <div class="text-xs text-gray-500 mt-1">${app.status ? 'Status: ' + app.status : ''}</div>
-                <div class="text-xs text-gray-500 mt-1">${app.symptoms ? 'Symptoms: ' + app.symptoms : ''}</div>
+                <div class="text-xs text-gray-500 mt-1">Status: ${app.status || 'Confirmed'}</div>
+                <div class="text-xs text-gray-500 mt-1">Symptoms: ${app.symptoms || 'None'}</div>
             `;
             appointmentsList.appendChild(appointmentCard);
         });
@@ -245,9 +268,10 @@
                             userIdDisplay.textContent = `Current User ID: ${userId}`;
                             setupRealtimeListener();
                         } else {
+                            // Fallback for anonymous users
                             userId = crypto.randomUUID();
                             userIdDisplay.textContent = `Anon User ID: ${userId}`;
-                            appointmentsList.innerHTML = '<p class="text-red-500 text-center">Authentication failed. Check Firebase Auth settings.</p>';
+                            setupRealtimeListener();
                         }
                         form.addEventListener('submit', bookAppointment);
                     });
