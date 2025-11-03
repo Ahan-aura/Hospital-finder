@@ -673,6 +673,349 @@
                 width: 100%;
             }
         }
+
+        /* Professional Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes checkmark {
+            0% {
+                stroke-dashoffset: 100;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Modal Card */
+        .modal-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #12d8c5, #037d97);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f3f4f6;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            transform: rotate(90deg);
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            animation: scaleIn 0.5s ease 0.2s backwards;
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .modal-icon.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .modal-icon.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .modal-icon i {
+            font-size: 40px;
+            color: white;
+        }
+
+        .modal-icon svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .checkmark-circle {
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            animation: checkmark 0.6s ease 0.4s forwards;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-message {
+            font-size: 1rem;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .modal-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .detail-value {
+            color: #6b7280;
+            font-size: 0.95rem;
+            text-align: right;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #02475b, #037d97);
+            color: white;
+        }
+
+        .modal-btn.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Receipt Card Specific Styles */
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-logo {
+            font-size: 2rem;
+            color: #02475b;
+            margin-bottom: 10px;
+        }
+
+        .receipt-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .receipt-subtitle {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .receipt-section {
+            margin-bottom: 20px;
+        }
+
+        .receipt-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #02475b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .receipt-total {
+            background: linear-gradient(135deg, #02475b, #037d97);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .receipt-total-label {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .receipt-total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Download Animation */
+        .download-progress {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .download-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #12d8c5, #037d97);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 600px) {
+            .modal-card {
+                padding: 30px 20px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -771,6 +1114,13 @@
         <i class="fas fa-plus"></i>
     </div>
 
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-card" id="modalCard">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
     <script>
         // Supabase config - TODO: move to env file later
         const SUPABASE_URL = 'https://ppfqkqzpvvjrrzobkwai.supabase.co';
@@ -780,6 +1130,244 @@
 
         let allBookings = [];
         let currentFilter = 'all';
+
+        // Modal Utility Functions
+        function showModal(content) {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalCard = document.getElementById('modalCard');
+            
+            modalCard.innerHTML = content;
+            modalOverlay.classList.add('active');
+            
+            // Close on overlay click
+            modalOverlay.onclick = (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            };
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modalOverlay');
+            modalOverlay.classList.remove('active');
+        }
+
+        function showSuccessModal(title, message, details = null) {
+            const detailsHTML = details ? `
+                <div class="modal-details">
+                    ${details.map(detail => `
+                        <div class="detail-row">
+                            <span class="detail-label">${detail.label}</span>
+                            <span class="detail-value">${detail.value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : '';
+
+            const content = `
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="modal-icon success">
+                    <svg viewBox="0 0 52 52">
+                        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="48" stroke-dashoffset="48" d="M14 27l8 8 16-16" style="animation: checkmark 0.6s ease 0.4s forwards;"/>
+                    </svg>
+                </div>
+                <h2 class="modal-title">${title}</h2>
+                <p class="modal-message">${message}</p>
+                ${detailsHTML}
+                <div class="modal-actions">
+                    <button class="modal-btn success" onclick="closeModal()">
+                        <i class="fas fa-check"></i> Got it!
+                    </button>
+                </div>
+            `;
+            
+            showModal(content);
+        }
+
+        function showReceiptModal(booking) {
+            const bookingId = booking.booking_id || booking.bookingId;
+            const consultType = booking.consultation_type || booking.consultationType;
+            const doctorName = booking.doctor_name || booking.doctorName || 'Dr. Assigned';
+            const amount = consultType === 'video' ? '499' : 
+                          consultType === 'audio' ? '299' : 
+                          consultType === 'chat' ? '199' : '999';
+            
+            const content = `
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="receipt-header">
+                    <div class="receipt-logo">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <div class="receipt-title">HealthCare Plus</div>
+                    <div class="receipt-subtitle">Consultation Receipt</div>
+                </div>
+
+                <div class="receipt-section">
+                    <div class="receipt-section-title">Booking Details</div>
+                    <div class="modal-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Booking ID</span>
+                            <span class="detail-value">#${bookingId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Type</span>
+                            <span class="detail-value">${consultType.charAt(0).toUpperCase() + consultType.slice(1)} Consultation</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Doctor</span>
+                            <span class="detail-value">${doctorName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date</span>
+                            <span class="detail-value">${booking.preferred_date || booking.preferredDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">${booking.preferred_time || booking.preferredTime}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="receipt-section">
+                    <div class="receipt-section-title">Patient Information</div>
+                    <div class="modal-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Name</span>
+                            <span class="detail-value">${booking.patient_name || booking.patientName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value">${booking.phone}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email</span>
+                            <span class="detail-value">${booking.email}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="receipt-total">
+                    <span class="receipt-total-label">Total Amount</span>
+                    <span class="receipt-total-amount">₹${amount}</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button class="modal-btn primary" onclick="downloadReceiptPDF('${bookingId}')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            `;
+            
+            showModal(content);
+        }
+
+        function downloadReceiptPDF(bookingId) {
+            const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            if (!booking) return;
+
+            const content = `
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="modal-icon info">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h2 class="modal-title">Downloading Receipt</h2>
+                <p class="modal-message">Your receipt is being prepared for download...</p>
+                
+                <div class="download-progress">
+                    <div class="download-bar" id="downloadBar"></div>
+                </div>
+
+                <div class="modal-message" style="font-size: 0.9rem; color: #10b981; display: none;" id="downloadComplete">
+                    <i class="fas fa-check-circle"></i> Download Complete!
+                </div>
+            `;
+            
+            showModal(content);
+
+            // Simulate download progress
+            let progress = 0;
+            const downloadBar = document.getElementById('downloadBar');
+            const interval = setInterval(() => {
+                progress += 10;
+                downloadBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('downloadComplete').style.display = 'block';
+                        // Trigger actual download
+                        generateAndDownloadPDF(booking);
+                        setTimeout(closeModal, 2000);
+                    }, 300);
+                }
+            }, 150);
+        }
+
+        function generateAndDownloadPDF(booking) {
+            // Create a simple text receipt
+            const bookingId = booking.booking_id || booking.bookingId;
+            const consultType = booking.consultation_type || booking.consultationType;
+            const amount = consultType === 'video' ? '499' : 
+                          consultType === 'audio' ? '299' : 
+                          consultType === 'chat' ? '199' : '999';
+            
+            const receiptText = `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      HEALTHCARE PLUS
+   CONSULTATION RECEIPT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BOOKING DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Booking ID: #${bookingId}
+Type: ${consultType.charAt(0).toUpperCase() + consultType.slice(1)} Consultation
+Doctor: ${booking.doctor_name || booking.doctorName || 'Dr. Assigned'}
+Date: ${booking.preferred_date || booking.preferredDate}
+Time: ${booking.preferred_time || booking.preferredTime}
+Status: ${booking.status}
+
+PATIENT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name: ${booking.patient_name || booking.patientName}
+Phone: ${booking.phone}
+Email: ${booking.email}
+
+MEDICAL DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Symptoms: ${booking.symptoms}
+
+PAYMENT SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total Amount: ₹${amount}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Thank you for choosing HealthCare Plus
+For support: contact@healthcareplus.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            `.trim();
+
+            // Create blob and download
+            const blob = new Blob([receiptText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Receipt_${bookingId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
 
         // Load everything when page loads
         window.addEventListener('DOMContentLoaded', async () => {
@@ -1092,41 +1680,16 @@
         function viewDetails(bookingId) {
             const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
             if (booking) {
-                const details = `
-Booking Details
-═══════════════════════════════
-
-Booking ID: ${bookingId}
-Status: ${booking.status || 'Confirmed'}
-
-Patient Information:
-- Name: ${booking.patient_name || booking.patientName}
-- Age: ${booking.age} years
-- Gender: ${booking.gender}
-
-Consultation Details:
-- Type: ${booking.consultation_type || booking.consultationType}
-- Specialty: ${booking.specialty}
-- Date: ${booking.preferred_date || booking.preferredDate}
-- Time: ${booking.preferred_time || booking.preferredTime}
-
-Contact Information:
-- Phone: ${booking.phone}
-- Email: ${booking.email}
-
-Medical Information:
-- Symptoms: ${booking.symptoms}
-
-Payment:
-- Amount: ₹${booking.consultation_type === 'video' ? '499' : booking.consultation_type === 'audio' ? '299' : booking.consultation_type === 'chat' ? '199' : '999'}
-                `;
-                alert(details);
+                showReceiptModal(booking);
             }
         }
 
         // Download receipt
         function downloadReceipt(bookingId) {
-            alert(`Receipt for booking ${bookingId} will be downloaded.\n\n(Feature coming soon!)`);
+            const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            if (booking) {
+                showReceiptModal(booking);
+            }
         }
 
         // Join Consultation (Video, Audio, Chat, or Emergency)
@@ -1305,31 +1868,88 @@ Payment:
 
         // Cancel booking
         async function cancelBooking(bookingId) {
-            if (confirm('Are you sure you want to cancel this booking?')) {
-                // Update in localStorage
-                const localBookings = JSON.parse(localStorage.getItem('consultations') || '[]');
-                const updatedLocal = localBookings.map(b => {
-                    if ((b.bookingId || b.booking_id) === bookingId) {
-                        return { ...b, status: 'Cancelled' };
-                    }
-                    return b;
-                });
-                localStorage.setItem('consultations', JSON.stringify(updatedLocal));
+            const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            if (!booking) return;
 
-                // Update in Supabase
-                try {
-                    await supabase
-                        .from('consultations')
-                        .update({ status: 'Cancelled' })
-                        .eq('booking_id', bookingId);
-                } catch (error) {
-                    console.log('Could not update Supabase:', error);
+            // Show confirmation modal
+            const content = `
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="modal-icon danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="modal-title">Cancel Booking?</h2>
+                <p class="modal-message">Are you sure you want to cancel this consultation? This action cannot be undone.</p>
+                
+                <div class="modal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Booking ID</span>
+                        <span class="detail-value">#${bookingId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Type</span>
+                        <span class="detail-value">${(booking.consultation_type || booking.consultationType).charAt(0).toUpperCase() + (booking.consultation_type || booking.consultationType).slice(1)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-value">${booking.preferred_date || booking.preferredDate}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Time</span>
+                        <span class="detail-value">${booking.preferred_time || booking.preferredTime}</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeModal()">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </button>
+                    <button class="modal-btn danger" onclick="confirmCancellation('${bookingId}')">
+                        <i class="fas fa-times-circle"></i> Yes, Cancel
+                    </button>
+                </div>
+            `;
+            
+            showModal(content);
+        }
+
+        async function confirmCancellation(bookingId) {
+            const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            
+            // Update in localStorage
+            const localBookings = JSON.parse(localStorage.getItem('consultations') || '[]');
+            const updatedLocal = localBookings.map(b => {
+                if ((b.bookingId || b.booking_id) === bookingId) {
+                    return { ...b, status: 'Cancelled' };
                 }
+                return b;
+            });
+            localStorage.setItem('consultations', JSON.stringify(updatedLocal));
 
-                // Reload bookings
-                await loadBookings();
-                alert('Booking cancelled successfully!');
+            // Update in Supabase
+            try {
+                await supabase
+                    .from('consultations')
+                    .update({ status: 'Cancelled' })
+                    .eq('booking_id', bookingId);
+            } catch (error) {
+                console.log('Could not update Supabase:', error);
             }
+
+            // Reload bookings
+            await loadBookings();
+            
+            // Show success modal
+            showSuccessModal(
+                'Booking Cancelled!',
+                'Your consultation has been cancelled successfully. A refund will be processed within 5-7 business days.',
+                [
+                    { label: 'Booking ID', value: `#${bookingId}` },
+                    { label: 'Type', value: `${(booking.consultation_type || booking.consultationType).charAt(0).toUpperCase() + (booking.consultation_type || booking.consultationType).slice(1)} Consultation` },
+                    { label: 'Cancelled On', value: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }
+                ]
+            );
         }
     </script>
 </body>
