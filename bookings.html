@@ -1050,10 +1050,10 @@
                     </div>
 
                     <div class="card-footer">
-                        ${(type === 'video' || type === 'audio') && status.toLowerCase() === 'confirmed' ? `
+                        ${status.toLowerCase() === 'confirmed' ? `
                             <button class="action-btn join-call" onclick="joinConsultation('${bookingId}', '${type}', '${phone}')">
-                                <i class="fas fa-${type === 'video' ? 'video' : 'phone-alt'}"></i>
-                                Join ${type === 'video' ? 'Video' : 'Audio'} Call
+                                <i class="fas fa-${type === 'video' ? 'video' : type === 'audio' ? 'phone-alt' : type === 'chat' ? 'comments' : 'ambulance'}"></i>
+                                ${type === 'video' ? 'Join Video Call' : type === 'audio' ? 'Join Audio Call' : type === 'chat' ? 'Start Chat' : 'Emergency Contact'}
                             </button>
                         ` : ''}
                         <button class="action-btn primary" onclick="viewDetails('${bookingId}')">
@@ -1129,7 +1129,7 @@ Payment:
             alert(`Receipt for booking ${bookingId} will be downloaded.\n\n(Feature coming soon!)`);
         }
 
-        // Join Consultation (Video or Audio Call)
+        // Join Consultation (Video, Audio, Chat, or Emergency)
         function joinConsultation(bookingId, type, phone) {
             const booking = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
             if (!booking) {
@@ -1143,6 +1143,12 @@ Payment:
             } else if (type === 'audio') {
                 // Initiate audio call
                 initiateAudioCall(phone);
+            } else if (type === 'chat') {
+                // Initiate chat
+                initiateChat(phone, bookingId);
+            } else if (type === 'emergency') {
+                // Initiate emergency contact
+                initiateEmergency(phone, bookingId);
             }
         }
 
@@ -1266,6 +1272,32 @@ Payment:
             const bookingId = bookingInfo ? (bookingInfo.booking_id || bookingInfo.bookingId) : 'N/A';
             
             const message = `Hi Doctor! I'm ${patientName} ready for my audio consultation.%0A%0ABooking ID: ${bookingId}%0AFrom: HealthCare Plus%0A%0APlease call me for the consultation.`;
+            const whatsappUrl = `https://wa.me/${doctorWhatsApp}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initiate Chat Consultation
+        function initiateChat(phone, bookingId) {
+            const doctorWhatsApp = '919014018689';
+            const bookingInfo = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            const patientName = bookingInfo ? (bookingInfo.patient_name || bookingInfo.patientName) : 'Patient';
+            const symptoms = bookingInfo ? (bookingInfo.symptoms || 'Not specified') : 'Not specified';
+            
+            const message = `Hi Doctor! I'm ${patientName} and I need a chat consultation.%0A%0ABooking ID: ${bookingId}%0ASymptoms: ${symptoms}%0AFrom: HealthCare Plus%0A%0AI'm ready to discuss my health concerns via chat.`;
+            const whatsappUrl = `https://wa.me/${doctorWhatsApp}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initiate Emergency Contact
+        function initiateEmergency(phone, bookingId) {
+            const doctorWhatsApp = '919014018689';
+            const bookingInfo = allBookings.find(b => (b.booking_id || b.bookingId) === bookingId);
+            const patientName = bookingInfo ? (bookingInfo.patient_name || bookingInfo.patientName) : 'Patient';
+            const symptoms = bookingInfo ? (bookingInfo.symptoms || 'Not specified') : 'Not specified';
+            
+            const message = `🚨 EMERGENCY 🚨%0A%0APatient: ${patientName}%0ABooking ID: ${bookingId}%0ASymptoms: ${symptoms}%0AContact: ${phone}%0AFrom: HealthCare Plus%0A%0A⚠️ URGENT MEDICAL ATTENTION REQUIRED!`;
             const whatsappUrl = `https://wa.me/${doctorWhatsApp}?text=${message}`;
             
             window.open(whatsappUrl, '_blank');
