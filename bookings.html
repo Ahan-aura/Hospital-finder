@@ -1189,12 +1189,12 @@ Payment:
                     <h2 style="color: #02475b; margin-bottom: 15px; font-size: 24px;">Join Video Consultation</h2>
                     <p style="color: #666; margin-bottom: 10px; font-size: 16px;">Booking ID: <strong>${bookingId}</strong></p>
                     <p style="color: #666; margin-bottom: 30px; font-size: 14px;">
-                        Contact Number: <strong>${phone}</strong>
+                        Doctor's WhatsApp: <strong>+91 9014018689</strong>
                     </p>
                     <div style="background: #f0f9ff; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
                         <p style="color: #0284c7; margin: 0; font-size: 14px; line-height: 1.6;">
                             <i class="fas fa-info-circle"></i> 
-                            Click the button below to initiate a video call. Make sure your camera and microphone are enabled.
+                            Click the button below to connect with the doctor via WhatsApp video call. Make sure your camera and microphone are enabled.
                         </p>
                     </div>
                     <div style="display: flex; gap: 10px; justify-content: center;">
@@ -1244,122 +1244,31 @@ Payment:
         }
 
         function startVideoCall(phone) {
-            // Option 1: Open a video call link (Google Meet, Zoom, etc.)
-            // For demo purposes, we'll show options
-            const options = `
-Which platform would you like to use for the video call?
-
-1. WhatsApp Video Call
-2. Google Meet (requires meeting link)
-3. Zoom (requires meeting link)
-4. Direct Phone Call to ${phone}
-
-For now, this will initiate a WhatsApp video call.
-            `;
+            // Directly connect to doctor's WhatsApp number
+            const doctorWhatsApp = '919014018689'; // WhatsApp format: country code + number
+            const bookingInfo = allBookings.find(b => b.phone === phone);
+            const patientName = bookingInfo ? (bookingInfo.patient_name || bookingInfo.patientName) : 'Patient';
+            const bookingId = bookingInfo ? (bookingInfo.booking_id || bookingInfo.bookingId) : 'N/A';
             
-            if (confirm(options)) {
-                // Open WhatsApp video call (works on mobile)
-                const whatsappUrl = `https://wa.me/${phone}?text=Hi, I'm ready for my video consultation (Booking from HealthCare Plus)`;
-                window.open(whatsappUrl, '_blank');
-                closeVideoCallModal();
-            }
+            const message = `Hi Doctor! I'm ${patientName} ready for my video consultation.%0A%0ABooking ID: ${bookingId}%0AFrom: HealthCare Plus`;
+            const whatsappUrl = `https://wa.me/${doctorWhatsApp}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
+            closeVideoCallModal();
         }
 
         // Initiate Audio Call
         function initiateAudioCall(phone) {
-            const modal = document.createElement('div');
-            modal.id = 'audioCallModal';
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.9);
-                z-index: 10000;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                animation: fadeIn 0.3s ease;
-            `;
-
-            modal.innerHTML = `
-                <div style="
-                    background: white;
-                    border-radius: 20px;
-                    padding: 40px;
-                    max-width: 450px;
-                    width: 90%;
-                    text-align: center;
-                    animation: slideUp 0.4s ease;
-                ">
-                    <div style="
-                        width: 80px;
-                        height: 80px;
-                        background: linear-gradient(135deg, #8b5cf6, #6366f1);
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin: 0 auto 20px;
-                    ">
-                        <i class="fas fa-phone-alt" style="font-size: 35px; color: white;"></i>
-                    </div>
-                    <h2 style="color: #02475b; margin-bottom: 15px; font-size: 24px;">Join Audio Consultation</h2>
-                    <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
-                        Contact: <strong style="font-size: 20px; color: #02475b;">${phone}</strong>
-                    </p>
-                    <div style="background: #f0fdf4; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-                        <p style="color: #15803d; margin: 0; font-size: 14px; line-height: 1.6;">
-                            <i class="fas fa-info-circle"></i> 
-                            Click the button below to call the doctor. Make sure you're in a quiet place for the consultation.
-                        </p>
-                    </div>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <a href="tel:${phone}" style="
-                            background: linear-gradient(135deg, #10b981, #059669);
-                            color: white;
-                            border: none;
-                            padding: 15px 30px;
-                            border-radius: 50px;
-                            font-size: 16px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            text-decoration: none;
-                            display: flex;
-                            align-items: center;
-                            gap: 8px;
-                            transition: all 0.3s ease;
-                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fas fa-phone-alt"></i>
-                            Call Now
-                        </a>
-                        <button onclick="closeAudioCallModal()" style="
-                            background: #e5e7eb;
-                            color: #374151;
-                            border: none;
-                            padding: 15px 30px;
-                            border-radius: 50px;
-                            font-size: 16px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                        " onmouseover="this.style.background='#d1d5db'" onmouseout="this.style.background='#e5e7eb'">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-        }
-
-        function closeAudioCallModal() {
-            const modal = document.getElementById('audioCallModal');
-            if (modal) {
-                modal.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => modal.remove(), 300);
-            }
+            // Directly connect to doctor's WhatsApp for audio call
+            const doctorWhatsApp = '919014018689';
+            const bookingInfo = allBookings.find(b => b.phone === phone);
+            const patientName = bookingInfo ? (bookingInfo.patient_name || bookingInfo.patientName) : 'Patient';
+            const bookingId = bookingInfo ? (bookingInfo.booking_id || bookingInfo.bookingId) : 'N/A';
+            
+            const message = `Hi Doctor! I'm ${patientName} ready for my audio consultation.%0A%0ABooking ID: ${bookingId}%0AFrom: HealthCare Plus%0A%0APlease call me for the consultation.`;
+            const whatsappUrl = `https://wa.me/${doctorWhatsApp}?text=${message}`;
+            
+            window.open(whatsappUrl, '_blank');
         }
 
         // Cancel booking
