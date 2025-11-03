@@ -118,31 +118,157 @@
             background: #f6fafc; border-radius: var(--border-radius);
             border: 1px solid #e1e7ec; box-shadow: none;
             max-width: 450px; width: 100%; padding: 10px 16px;
-            transition: var(--transition);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .search-pill:hover, .search-pill:focus-within {
-            box-shadow: 0 0 0 2px rgba(18, 216, 197, 0.3);
+            box-shadow: 0 0 0 3px rgba(18, 216, 197, 0.2);
             border-color: var(--accent);
+            transform: translateY(-2px);
         }
-        .search-pill .fa-magnifying-glass { font-size: 1rem; color: #7bbdd6; margin-right: 10px; }
+        .search-pill .fa-magnifying-glass { 
+            font-size: 1rem; 
+            color: #7bbdd6; 
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        .search-pill:focus-within .fa-magnifying-glass {
+            color: var(--accent);
+            transform: scale(1.1) rotate(10deg);
+        }
         .search-pill input {
             border: none; background: transparent; font-size: 1rem;
             outline: none; color: var(--primary); width: 100%;
         }
         .search-pill input::placeholder { color: var(--text-light); }
-        /* New: Search Results Dropdown */
+        
+        /* Enhanced Search Results Dropdown */
         .search-results {
-            position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg);
-            border: 1px solid #e1e7ec; border-radius: 0 0 var(--border-radius) var(--border-radius);
-            max-height: 300px; overflow-y: auto; display: none; z-index: 10;
-            box-shadow: var(--shadow-medium);
+            position: absolute; 
+            top: calc(100% + 8px); 
+            left: 0; 
+            right: 0; 
+            background: white;
+            border: 1px solid #e1e7ec; 
+            border-radius: 12px;
+            max-height: 400px; 
+            overflow-y: auto; 
+            display: none; 
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .search-results::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .search-results::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .search-results::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        
         .search-result-item {
-            padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0;
-            transition: var(--transition);
+            padding: 14px 18px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .search-result-item:hover { background: #eaf3f5; }
+        
+        .search-result-item:hover { 
+            background: linear-gradient(to right, #eaf3f5, #f0f9ff);
+            padding-left: 24px;
+            border-left: 3px solid var(--accent);
+        }
+        
         .search-result-item:last-child { border-bottom: none; }
+        
+        .search-result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .search-result-icon.doctor {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .search-result-icon.specialty {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .search-result-icon.condition {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .search-result-content {
+            flex: 1;
+        }
+        
+        .search-result-title {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+        
+        .search-result-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+        
+        .search-no-results {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        .search-no-results i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+        
+        .search-loading {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        .search-loading i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* Login/User Pills - Enhanced */
         .login-pill, .user-pill {
@@ -1262,28 +1388,159 @@
         });
 
         // New: Search Functionality
+        // Enhanced Search Functionality with Animation
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
-        const mockSearchData = [
-            { name: 'Dr. John Doe - Cardiologist', specialty: 'Cardiology' },
-            { name: 'Dr. Jane Smith - Dentist', specialty: 'Dentistry' },
-            { name: 'Hypertension Treatment', condition: 'Medical Condition' },
-            { name: 'Root Canal Procedure', treatment: 'Dental Treatment' }
+        
+        // Comprehensive Search Database
+        const searchDatabase = [
+            // Doctors
+            { type: 'doctor', name: 'Dr. Rajesh Kumar', specialty: 'Cardiologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Priya Sharma', specialty: 'Pediatrician', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Anil Reddy', specialty: 'Orthopedic Surgeon', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Sneha Patel', specialty: 'Dermatologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Vikram Singh', specialty: 'Neurologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Anita Desai', specialty: 'Gynecologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Ramesh Babu', specialty: 'Dentist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            { type: 'doctor', name: 'Dr. Lakshmi Narayanan', specialty: 'ENT Specialist', location: 'Tirupathi', icon: 'fa-user-doctor' },
+            
+            // Specialties
+            { type: 'specialty', name: 'Cardiology', description: 'Heart & Cardiovascular Care', icon: 'fa-heart-pulse' },
+            { type: 'specialty', name: 'Pediatrics', description: 'Child Health Care', icon: 'fa-child' },
+            { type: 'specialty', name: 'Orthopedics', description: 'Bone & Joint Care', icon: 'fa-bone' },
+            { type: 'specialty', name: 'Dermatology', description: 'Skin Care Specialist', icon: 'fa-hand-dots' },
+            { type: 'specialty', name: 'Neurology', description: 'Brain & Nervous System', icon: 'fa-brain' },
+            { type: 'specialty', name: 'Gynecology', description: "Women's Health", icon: 'fa-person-dress' },
+            { type: 'specialty', name: 'Dentistry', description: 'Dental Care', icon: 'fa-tooth' },
+            { type: 'specialty', name: 'ENT', description: 'Ear, Nose & Throat', icon: 'fa-ear-listen' },
+            { type: 'specialty', name: 'General Medicine', description: 'Primary Care', icon: 'fa-stethoscope' },
+            { type: 'specialty', name: 'Ophthalmology', description: 'Eye Care', icon: 'fa-eye' },
+            
+            // Medical Conditions
+            { type: 'condition', name: 'Diabetes', description: 'Blood Sugar Management', icon: 'fa-droplet' },
+            { type: 'condition', name: 'Hypertension', description: 'High Blood Pressure', icon: 'fa-heart-pulse' },
+            { type: 'condition', name: 'Asthma', description: 'Respiratory Condition', icon: 'fa-lungs' },
+            { type: 'condition', name: 'Arthritis', description: 'Joint Pain & Inflammation', icon: 'fa-bone' },
+            { type: 'condition', name: 'Migraine', description: 'Severe Headaches', icon: 'fa-head-side-virus' },
+            { type: 'condition', name: 'Fever', description: 'High Temperature', icon: 'fa-temperature-high' },
+            { type: 'condition', name: 'Cold & Flu', description: 'Common Cold Symptoms', icon: 'fa-virus' },
+            { type: 'condition', name: 'Back Pain', description: 'Spine & Back Issues', icon: 'fa-person-walking' },
         ];
+        
+        let searchTimeout;
+        
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            if (query.length < 2) { searchResults.style.display = 'none'; return; }
-            const filtered = mockSearchData.filter(item => 
-                item.name.toLowerCase().includes(query) || item.specialty?.toLowerCase().includes(query)
-            );
-            searchResults.innerHTML = filtered.map(item => `<div class="search-result-item" onclick="selectSearchResult('${item.name}')">${item.name}</div>`).join('');
-            searchResults.style.display = filtered.length ? 'block' : 'none';
+            const query = e.target.value.trim();
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) { 
+                searchResults.style.display = 'none'; 
+                return; 
+            }
+            
+            // Show loading state
+            searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner"></i> Searching...</div>';
+            searchResults.style.display = 'block';
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                performSearch(query);
+            }, 300);
         });
-        function selectSearchResult(result) {
-            alert(`Selected: ${result}`); // Replace with navigation or modal
-            searchInput.value = '';
-            searchResults.style.display = 'none';
+        
+        function performSearch(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            // Filter results
+            const filtered = searchDatabase.filter(item => 
+                item.name.toLowerCase().includes(lowerQuery) || 
+                (item.specialty && item.specialty.toLowerCase().includes(lowerQuery)) ||
+                (item.description && item.description.toLowerCase().includes(lowerQuery))
+            );
+            
+            // Display results
+            if (filtered.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-no-results">
+                        <i class="fas fa-search"></i>
+                        <div style="margin-top: 8px; font-weight: 600;">No results found</div>
+                        <div style="font-size: 0.85rem;">Try searching for doctors, specialties, or conditions</div>
+                    </div>
+                `;
+            } else {
+                searchResults.innerHTML = filtered.map(item => createSearchResultHTML(item)).join('');
+            }
+            
+            searchResults.style.display = 'block';
         }
+        
+        function createSearchResultHTML(item) {
+            const iconClass = item.type === 'doctor' ? 'doctor' : 
+                            item.type === 'specialty' ? 'specialty' : 'condition';
+            
+            const subtitle = item.type === 'doctor' 
+                ? `${item.specialty} • ${item.location}`
+                : item.description;
+            
+            return `
+                <div class="search-result-item" onclick="selectSearchResult('${item.name}', '${item.type}')">
+                    <div class="search-result-icon ${iconClass}">
+                        <i class="fas ${item.icon}"></i>
+                    </div>
+                    <div class="search-result-content">
+                        <div class="search-result-title">${item.name}</div>
+                        <div class="search-result-subtitle">${subtitle}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function selectSearchResult(name, type) {
+            // Add smooth closing animation
+            searchResults.style.animation = 'slideUp 0.2s ease';
+            
+            setTimeout(() => {
+                searchInput.value = name;
+                searchResults.style.display = 'none';
+                searchResults.style.animation = '';
+                
+                // Redirect based on type
+                if (type === 'doctor' || type === 'specialty') {
+                    window.location.href = 'find.html';
+                } else if (type === 'condition') {
+                    window.location.href = 'consult.html';
+                }
+            }, 200);
+        }
+        
+        // Add slide up animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideUp {
+                to {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-pill')) {
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        // Close search on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                searchResults.style.display = 'none';
+                searchInput.blur();
+            }
+        });
 
         // New: Auto-scrolling Testimonials
         const carousel = document.getElementById('testimonialCarousel');
