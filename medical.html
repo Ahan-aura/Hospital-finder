@@ -1,66 +1,209 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Medical Condition - Hospital Management</title>
+  <title>Medical Conditions - Hospital Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* Base Reset and Fonts */
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
     }
+
+    :root {
+      --primary: #02475b;
+      --secondary: #037d97;
+      --accent: #12d8c5;
+      --card-bg: #ffffff;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #e8f5f1, #cce7e2);
       color: #054e5b;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
-      flex-direction: column;
-      align-items: center;
+      padding-top: 180px;
       transition: background 0.5s ease;
     }
 
-    /* Full width header */
-    header {
+    /* Header Navbar Styles */
+    .header-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw; /* full viewport width */
-      background:#02475b;
-      padding: 18px 40px;
-      box-sizing: border-box;
-      box-shadow: 0 8px 20px rgba(0, 77, 64, 0.4);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 1.9rem;
+      right: 0;
+      z-index: 1000;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 5vw;
+      background: white;
+      gap: 20px;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+      border-radius: 8px;
+    }
+
+    .navbar-content {
       display: flex;
       align-items: center;
-      gap: 12px;
-      z-index: 1000;
-      user-select: none;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      letter-spacing: 0.03em;
-      backdrop-filter: saturate(180%) blur(8px);
+      gap: 20px;
+      flex: 1;
+      justify-content: flex-end;
     }
-   .co{
-    position: relative;
-    left:550px;
-   }
+
+    .location-wrapper {
+      position: relative;
+    }
+
+    .location-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f6fafc;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid #e1e7ec;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .location-pill:hover {
+      box-shadow: 0 0 0 3px rgba(18, 216, 197, 0.2);
+      border-color: var(--accent);
+    }
+
+    .location-pill i {
+      color: #7bbdd6;
+      font-size: 1rem;
+    }
+
+    .search-pill {
+      display: flex;
+      align-items: center;
+      background: #f6fafc;
+      border-radius: 8px;
+      border: 1px solid #e1e7ec;
+      max-width: 400px;
+      width: 100%;
+      padding: 10px 16px;
+      transition: all 0.3s ease;
+    }
+
+    .search-pill:hover,
+    .search-pill:focus-within {
+      box-shadow: 0 0 0 3px rgba(18, 216, 197, 0.2);
+      border-color: var(--accent);
+    }
+
+    .search-pill i {
+      font-size: 1rem;
+      color: #7bbdd6;
+      margin-right: 10px;
+    }
+
+    .search-pill input {
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      outline: none;
+      color: var(--primary);
+      width: 100%;
+    }
+
+    .search-pill input::placeholder {
+      color: #6b7280;
+    }
+
+    .login-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid var(--primary);
+      background: var(--card-bg);
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .login-pill:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .bottom-navbar {
+      background: #fdfdfd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .bottom-navbar ul {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      padding: 12px 0;
+      margin: 0;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .bottom-navbar ul li a {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #0e404b;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .bottom-navbar ul li a:hover,
+    .bottom-navbar ul li a.active {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
 
     /* Push content down below fixed header */
     .container {
       max-width: 1000px;
       width: 100%;
-      margin-top: 90px; /* header height + some space */
+      margin: 20px auto;
       padding: 0 15px;
     }
 
-    /* Hide old h2 */
-    h2 {
-      display: none;
+    /* Page title */
+    .page-title {
+      text-align: center;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 30px;
+      font-weight: 700;
     }
 
     /* Card styles */
@@ -209,13 +352,42 @@
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="co">Medical Condition</div>
-  </header>
+  <div class="header-container">
+    <div class="navbar">
+      <div class="logo">
+        <img src="https://static.vecteezy.com/system/resources/previews/046/305/217/original/hospital-logo-design-illustration-vector.jpg" alt="Hospital Logo" />
+      </div>
+      <div class="navbar-content">
+        <div class="location-wrapper">
+          <div class="location-pill">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>Tirupathi</span>
+          </div>
+        </div>
+        <div class="search-pill">
+          <i class="fa fa-magnifying-glass"></i>
+          <input type="search" placeholder="Search medical conditions..." />
+        </div>
+        <a href="index.html" class="login-pill">
+          <i class="fa fa-home"></i> Home
+        </a>
+      </div>
+    </div>
+    <div class="bottom-navbar">
+      <ul>
+        <li><a href="find.html">Find a Doctor</a></li>
+        <li><a href="bloodBank.html">Blood Bank</a></li>
+        <li><a href="health.html">Health Packages</a></li>
+        <li><a href="bookings.html">My bookings</a></li>
+        <li><a href="medical.html" class="active">Medical Conditions</a></li>
+        <li><a href="consult.html">Consult Online</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </div>
 
   <div class="container">
-
+    <h2 class="page-title">Medical Conditions Management</h2>
     <!-- Form Section -->
     <div class="card" aria-label="Add Medical Condition Form">
       <form id="conditionForm" novalidate>
