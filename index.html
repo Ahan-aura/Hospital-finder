@@ -1388,130 +1388,121 @@
         });
 
         // New: Search Functionality
-        // Enhanced Search Functionality with Animation
+        // Simple Search Functionality - Direct Navigation
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
         
-        // Comprehensive Search Database
-        const searchDatabase = [
-            // Doctors
-            { type: 'doctor', name: 'Dr. Rajesh Kumar', specialty: 'Cardiologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Priya Sharma', specialty: 'Pediatrician', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Anil Reddy', specialty: 'Orthopedic Surgeon', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Sneha Patel', specialty: 'Dermatologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Vikram Singh', specialty: 'Neurologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Anita Desai', specialty: 'Gynecologist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Ramesh Babu', specialty: 'Dentist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            { type: 'doctor', name: 'Dr. Lakshmi Narayanan', specialty: 'ENT Specialist', location: 'Tirupathi', icon: 'fa-user-doctor' },
-            
-            // Specialties
-            { type: 'specialty', name: 'Cardiology', description: 'Heart & Cardiovascular Care', icon: 'fa-heart-pulse' },
-            { type: 'specialty', name: 'Pediatrics', description: 'Child Health Care', icon: 'fa-child' },
-            { type: 'specialty', name: 'Orthopedics', description: 'Bone & Joint Care', icon: 'fa-bone' },
-            { type: 'specialty', name: 'Dermatology', description: 'Skin Care Specialist', icon: 'fa-hand-dots' },
-            { type: 'specialty', name: 'Neurology', description: 'Brain & Nervous System', icon: 'fa-brain' },
-            { type: 'specialty', name: 'Gynecology', description: "Women's Health", icon: 'fa-person-dress' },
-            { type: 'specialty', name: 'Dentistry', description: 'Dental Care', icon: 'fa-tooth' },
-            { type: 'specialty', name: 'ENT', description: 'Ear, Nose & Throat', icon: 'fa-ear-listen' },
-            { type: 'specialty', name: 'General Medicine', description: 'Primary Care', icon: 'fa-stethoscope' },
-            { type: 'specialty', name: 'Ophthalmology', description: 'Eye Care', icon: 'fa-eye' },
-            
-            // Medical Conditions
-            { type: 'condition', name: 'Diabetes', description: 'Blood Sugar Management', icon: 'fa-droplet' },
-            { type: 'condition', name: 'Hypertension', description: 'High Blood Pressure', icon: 'fa-heart-pulse' },
-            { type: 'condition', name: 'Asthma', description: 'Respiratory Condition', icon: 'fa-lungs' },
-            { type: 'condition', name: 'Arthritis', description: 'Joint Pain & Inflammation', icon: 'fa-bone' },
-            { type: 'condition', name: 'Migraine', description: 'Severe Headaches', icon: 'fa-head-side-virus' },
-            { type: 'condition', name: 'Fever', description: 'High Temperature', icon: 'fa-temperature-high' },
-            { type: 'condition', name: 'Cold & Flu', description: 'Common Cold Symptoms', icon: 'fa-virus' },
-            { type: 'condition', name: 'Back Pain', description: 'Spine & Back Issues', icon: 'fa-person-walking' },
-        ];
-        
-        let searchTimeout;
+        // Quick search keywords for navigation
+        const searchKeywords = {
+            doctors: ['doctor', 'dr', 'physician', 'specialist', 'consultant'],
+            bloodBank: ['blood', 'donor', 'donation', 'blood bank', 'donate'],
+            consult: ['consult', 'consultation', 'online', 'chat', 'video', 'audio', 'emergency', 'appointment'],
+            contact: ['contact', 'help', 'support', 'address', 'phone', 'email']
+        };
         
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
-            
-            // Clear previous timeout
-            clearTimeout(searchTimeout);
+            const query = e.target.value.trim().toLowerCase();
             
             if (query.length < 2) { 
                 searchResults.style.display = 'none'; 
                 return; 
             }
             
-            // Show loading state
-            searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner"></i> Searching...</div>';
-            searchResults.style.display = 'block';
+            // Show simple suggestions
+            const suggestions = generateSuggestions(query);
             
-            // Debounce search
-            searchTimeout = setTimeout(() => {
-                performSearch(query);
-            }, 300);
+            if (suggestions.length > 0) {
+                searchResults.innerHTML = suggestions.map(s => `
+                    <div class="search-result-item" onclick="navigateToPage('${s.url}')">
+                        <div class="search-result-icon ${s.color}">
+                            <i class="fas ${s.icon}"></i>
+                        </div>
+                        <div class="search-result-content">
+                            <div class="search-result-title">${s.title}</div>
+                            <div class="search-result-subtitle">${s.subtitle}</div>
+                        </div>
+                    </div>
+                `).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.style.display = 'none';
+            }
         });
         
-        function performSearch(query) {
-            const lowerQuery = query.toLowerCase();
+        function generateSuggestions(query) {
+            const suggestions = [];
             
-            // Filter results
-            const filtered = searchDatabase.filter(item => 
-                item.name.toLowerCase().includes(lowerQuery) || 
-                (item.specialty && item.specialty.toLowerCase().includes(lowerQuery)) ||
-                (item.description && item.description.toLowerCase().includes(lowerQuery))
-            );
-            
-            // Display results
-            if (filtered.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="search-no-results">
-                        <i class="fas fa-search"></i>
-                        <div style="margin-top: 8px; font-weight: 600;">No results found</div>
-                        <div style="font-size: 0.85rem;">Try searching for doctors, specialties, or conditions</div>
-                    </div>
-                `;
-            } else {
-                searchResults.innerHTML = filtered.map(item => createSearchResultHTML(item)).join('');
+            // Check for doctor/specialist related searches
+            if (searchKeywords.doctors.some(keyword => query.includes(keyword))) {
+                suggestions.push({
+                    title: 'Find a Doctor',
+                    subtitle: 'Search for doctors by specialty',
+                    icon: 'fa-user-doctor',
+                    color: 'doctor',
+                    url: 'find.html'
+                });
             }
             
-            searchResults.style.display = 'block';
+            // Check for blood bank related searches
+            if (searchKeywords.bloodBank.some(keyword => query.includes(keyword))) {
+                suggestions.push({
+                    title: 'Blood Bank',
+                    subtitle: 'Check availability & donate blood',
+                    icon: 'fa-tint',
+                    color: 'condition',
+                    url: 'bloodBank.html'
+                });
+            }
+            
+            // Check for consultation related searches
+            if (searchKeywords.consult.some(keyword => query.includes(keyword))) {
+                suggestions.push({
+                    title: 'Online Consultation',
+                    subtitle: 'Video, Audio, Chat & Emergency',
+                    icon: 'fa-video',
+                    color: 'specialty',
+                    url: 'consult.html'
+                });
+            }
+            
+            // Check for contact related searches
+            if (searchKeywords.contact.some(keyword => query.includes(keyword))) {
+                suggestions.push({
+                    title: 'Contact Us',
+                    subtitle: 'Get in touch with us',
+                    icon: 'fa-phone',
+                    color: 'doctor',
+                    url: 'contact.html'
+                });
+            }
+            
+            // If no specific matches, show general navigation options
+            if (suggestions.length === 0) {
+                suggestions.push(
+                    {
+                        title: 'Find a Doctor',
+                        subtitle: 'Browse doctors and specialties',
+                        icon: 'fa-user-doctor',
+                        color: 'doctor',
+                        url: 'find.html'
+                    },
+                    {
+                        title: 'Online Consultation',
+                        subtitle: 'Book video/audio consultation',
+                        icon: 'fa-video',
+                        color: 'specialty',
+                        url: 'consult.html'
+                    }
+                );
+            }
+            
+            return suggestions;
         }
         
-        function createSearchResultHTML(item) {
-            const iconClass = item.type === 'doctor' ? 'doctor' : 
-                            item.type === 'specialty' ? 'specialty' : 'condition';
-            
-            const subtitle = item.type === 'doctor' 
-                ? `${item.specialty} • ${item.location}`
-                : item.description;
-            
-            return `
-                <div class="search-result-item" onclick="selectSearchResult('${item.name}', '${item.type}')">
-                    <div class="search-result-icon ${iconClass}">
-                        <i class="fas ${item.icon}"></i>
-                    </div>
-                    <div class="search-result-content">
-                        <div class="search-result-title">${item.name}</div>
-                        <div class="search-result-subtitle">${subtitle}</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function selectSearchResult(name, type) {
-            // Add smooth closing animation
+        function navigateToPage(url) {
             searchResults.style.animation = 'slideUp 0.2s ease';
-            
             setTimeout(() => {
-                searchInput.value = name;
-                searchResults.style.display = 'none';
-                searchResults.style.animation = '';
-                
-                // Redirect based on type
-                if (type === 'doctor' || type === 'specialty') {
-                    window.location.href = 'find.html';
-                } else if (type === 'condition') {
-                    window.location.href = 'consult.html';
-                }
+                window.location.href = url;
             }, 200);
         }
         
